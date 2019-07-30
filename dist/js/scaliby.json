@@ -1,0 +1,48 @@
+{
+  "debug": true,
+  "imageDirectory": "./img/",
+  "i18n": {
+    "dateType": 2,
+    "dateSeparator": "/",
+    "numberDecimalSeparator": ".",
+    "numberGroupSeparator": ","
+  },
+  "messages": {
+    "button": {
+      "cancel": "Cancel",
+      "accept": "Accept",
+      "clear": "Clear"
+    },
+    "comm": {
+      "communicationError": "Communication Error.",
+      "communicationProblem": "Problem of communication with the server."
+    },
+    "listing": {
+      "recordNotFound": "No matching records found.",
+      "rowsPerPage": "_MENU_ entries per page",
+      "loading": "Loading...",
+      "processing": "Processing...",
+      "sortAscending": ": activate to sort column ascending",
+      "sortDescending": ": activate to sort column descending",
+      "filterButtonTitle": "Filter",
+      "selectAllButtonTitle": "Select all rows",
+      "deselectAllButtonTitle": "Deselect all rows"
+    },
+    "datepicker": {
+      "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+      "shortMonths": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      "weekDays": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      "shortDays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+      "selectedFormat": "D, mmm dd",
+      "monthHeadFormat": "mmmm yyyy"
+    },
+    "fileUploader": {
+      "invalidType": "File '$' has incorrect file type.",
+      "maxSize": "File '$' exceeded maximum size($).",
+      "maxFiles": "Exceeded the maximum of files($).",
+      "sendError": "Error while sending the file $.",
+      "alreadyUploaded": "File '$' already uploaded."
+    }
+  }
+
+}

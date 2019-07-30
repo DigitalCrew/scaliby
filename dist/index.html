@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Scaliby</title>
+    <meta charset="UTF-8">
+
+    <style>
+        .list-image {
+            margin-left: 32px;
+            margin-right: 32px;
+            width: 48px;
+            height: 48px;
+            display: inline-flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .cell {
+            padding: 0 !important;
+            font-size: 80%;
+        }
+    </style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/3.6.95/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="css/scaliby-1.0.0.min.css">
+    <script src="js/scaliby-1.0.0.min.js"></script>
+</head>
+
+<body class="mdc-typography" style="background-color: #e0e0e0;">
+<!-- Layout -->
+<div id="drawer" class="s-layout" data-type="removable">
+
+    <!-- Sidebar -->
+    <aside>
+        <!-- Sidebar Header -->
+        <div class="s-layout-sidebar-header"><b>Sidebar Header</b></div>
+
+        <!-- Sidebar Content -->
+        <div class="s-layout-sidebar-content">SideBar Content</div>
+    </aside>
+
+    <!-- Header -->
+    <header><b>Scaliby - Web Front-end Framework</b></header>
+
+    <!-- Content -->
+    <main>
+        <!-- TAB of components groups -->
+        <div class="s-tab">
+            <div id="tab_input" data-title="Input" data-selected="true" style="background-color:#f9f9ff"></div>
+            <div id="tab_button" data-title="Button" style="background-color:#f9f9ff"></div>
+            <div id="tab_panel" data-title="Panel" style="background-color:#f9f9ff"></div>
+            <div id="tab_list" data-title="List" style="background-color:#f9f9ff"></div>
+            <div id="tab_others" data-title="Other" style="background-color:#f9f9ff"></div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background-color: #efefef;">
+        2018 - DigitalCrew
+    </footer>
+
+</div>
+
+
+<!-- *************************************************************************************************************** -->
+<!-- *************************************************** INPUT ***************************************************** -->
+<!-- *************************************************************************************************************** -->
+<form id="frm_input" action="" method="post">
+    <div class="s-grid">
+
+        <div class="s-cell-2" style="background-color:#f0f0ff">
+            <!-- Textfield (common) -->
+            <input class="s-input" name="input1" data-label="Common" required maxlength="30" data-error="Error Message">
+        </div>
+
+        <div class="s-cell-2" style="background-color:#f0f0ff">
+            <!-- Textfield (mask) -->
+            <input class="s-input" name="input2" data-label="With Mask" required data-mask="getSerialNumber"
+                   data-error="Error Message">
+        </div>
+
+        <div class="s-cell-2" style="background-color:#f0f0ff">
+            <!-- Textfield (icon) -->
+            <input class="s-input" name="input3" data-label="With Icon" required data-icon="build"
+                   data-error="Error Message">
+        </div>
+
+        <div class="s-cell-2" style="background-color:#f0f0ff">
+            <!-- Textfield (date) -->
+            <input class="s-input" name="input4" data-label="Date" required data-icon="DATE"
+                   data-error="Error Message">
+        </div>
+
+        <div class="s-cell-2" style="background-color:#f0f0ff">
+            <!-- Textfield (time) -->
+            <input class="s-input" name="input5" data-label="Time" required data-icon="TIME"
+                   data-error="Error Message">
+        </div>
+
+        <div class="s-cell-2" style="background-color:#f0f0ff">
+            &nbsp;
+        </div>
+
+        <div class="s-cell-4" style="background-color:#f0f0ff">
+            <!-- Textarea -->
+            <textarea class="s-input" name="input6" data-label="Long Text" required rows="3" maxlength="200"
+                      data-error="Error Message"></textarea>
+        </div>
+
+        <div class="s-cell-2" style="background-color:#f0f0ff">
+            <input class="s-input" data-label="Only Layout">
+        </div>
+
+        <div class="s-cell-2" style="background-color:#f0f0ff">
+            <!-- Switch -->
+            <input class="s-input s-switch" type="checkbox" name="input7" data-label="Switch"
+                   data-text="No / Yes" data-error="Error Message" checked>
+        </div>
+
+        <div class="s-cell-2" style="background-color:#f0f0ff">
+            <!-- Radiobox -->
+            <div data-label="Choice" data-required="true" data-error="Error Message">
+                <input class="s-input" type="radio" name="input8" data-text="Option A" checked value="Op 1">
+                <input class="s-input" type="radio" name="input8" data-text="Option B" value="Op 2">
+                <input class="s-input" type="radio" name="input8" data-text="Option C" value="Op 3">
+            </div>
+        </div>
+
+        <div class="s-cell-2" style="background-color:#f0f0ff">
+            <!-- Checkbox -->
+            <div data-label="Multiple Choice" data-required="true" data-error="Error Message">
+                <input class="s-input" type="checkbox" name="input9" data-text="Option do D" checked value="Op 4">
+                <input class="s-input" type="checkbox" name="input9" data-text="Option do E" value="Op 5">
+                <input class="s-input" type="checkbox" name="input9" data-text="Option do F" value="Op 6">
+            </div>
+        </div>
+
+        <div class="s-cell-3" style="background-color:#f0f0ff">
+            <!-- Select -->
+            <select class="s-input" name="input10" data-label="Select" required data-error="Error Message">
+                <option value=""></option>
+                <optgroup label="Numbers">
+                    <option value="0">Option 1</option>
+                    <option value="1">Option 2</option>
+                    <option value="2" disabled>Option 3</option>
+                </optgroup>
+                <optgroup label="Letters">
+                    <option value="3" >Option A</option>
+                    <option value="4" disabled>Option B</option>
+                    <option value="5">Option C</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <div class="s-cell-3" style="background-color:#f0f0ff">
+            <!-- Multi Select -->
+            <select class="s-input" multiple name="input11" size="8" data-label="Multiple Select" required data-error="Error Message">
+                <optgroup label="Numbers">
+                    <option value="111">Option 111</option>
+                    <option value="222">Option 222</option>
+                    <option value="333" disabled>Option 333</option>
+                </optgroup>
+                <optgroup label="Letters">
+                    <option value="AAA">Option AAA</option>
+                    <option value="BBB" disabled>Option BBB</option>
+                    <option value="CCC">Option CCC</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <div class="s-cell-3" style="background-color:#f0f0ff">
+            <!-- Search Select -->
+            <select class="s-input" name="input12" data-label="Search" required size="5" data-search="javascript:search()" data-error="Error Message"></select>
+        </div>
+
+        <div class="s-cell-3" style="background-color:#f0f0ff">
+            <input class="s-input" data-label="Only Layout">
+        </div>
+
+        <div class="s-cell-6" style="background-color:#f0f0ff">
+            <!-- File uploader -->
+<!--            <div class="s-file-uploader" id="file" data-mime-types="image/jpeg,image/png" data-extensions="jpg,png,rar" data-multiple="true" data-max-size="50000" data-max-files="3" data-url-send="" data-url-cancel=""></div>-->
+            <div class="s-file-uploader" id="file" data-extensions="jpg,png,rar" data-multiple="true" data-max-size="50000"
+                 data-max-files="3" data-url-send="" data-url-cancel="" data-url-download=""></div>
+        </div>
+
+        <div class="s-cell-12" style="background-color:#f0f0ff">
+            <button type="button" style="float:left" onclick="showHideError();">Show/Hide Error</button>
+            <button type="button" style="float:left" onclick="showHideInput();">Show/Hide Input</button>
+            <button type="button" style="float:left" onclick="activateDeactivate();">Activate/Deactivate</button>
+            <button type="button" style="float:left" onclick="removeInsertMandatory();">Mandatory</button>
+            <button type="button" style="float:left" onclick="seeValues();">See Values</button>
+            <button type="button" style="float:left" onclick="saveValues();">Salve Values</button>
+            <button type="button" style="float:left" onclick="recoverValues();">Recover Values</button>
+            <button type="button" style="float:left" onclick="showSuggestion();">Suggestion</button>
+        </div>
+
+    </div>
+</form>
+
+<script>
+    //Builds an array with input components
+    var list = Form.getFields(document.getElementById("frm_input"));
+    var elems = [];
+    for (i = 0; i < list.length; i++) {
+        if (list[i].type !== "button") {
+            elems[elems.length] = list[i];
+        }
+    }
+
+    //Mask of serial number
+    function getSerialNumber() {
+        return {
+            type: "decimal",
+            decimals: 2
+        };
+
+        // return {
+        //     "type": "string",
+        //     "definition": "AAAA"
+        // }
+
+        // return {
+        //     "type": "string",
+        //     "definition": "00000-00000-00000"
+        // }
+    }
+
+    //Builds the options of searchSelect component
+    function search() {
+        var elem = document.getElementsByName("input12")[0];
+        var dados = [ [0, "tree"], [1, "pear"], [2, "truck"], [3, "door"], [4, "gray"], [5, "design"], [6, "shoot"],
+            [7, "football"], [8, "tied"], [9, "swimming"], [10, "collisin"], [11, "cooking"], [12 ,"Apple"],
+            [13 ,"Watermelon"], [14 ,"Orange"], [15 ,"Pear"], [16 ,"Cherry"], [17 ,"Strawberry"], [18 ,"Nectarine"],
+            [19 ,"Grape"], [20 ,"Mango"], [21 ,"Blueberry"], [22 ,"Pomegranate"], [23 ,"Starfruit"], [24 ,"Plum"],
+            [25 ,"Banana"], [26 ,"Raspberry"], [27 ,"Mandarin"], [28 ,"Jackfruit"], [29 ,"Papaya"], [30 ,"Kiwi"],
+            [31 ,"Pineapple"], [32 ,"Lime"], [33 ,"Lemon"], [34 ,"Apricot"], [35 ,"Grapefruit"], [36 ,"Melon"],
+            [37 ,"Coconut"], [38 ,"Avocado"], [39 ,"Peach"], [40 ,"nincompooperies"], [41 ,"noncooperations"],
+            [42 ,"grandparenthood"], [43 ,"incoordinations"], [44 ,"dessertspoonful"], [45 ,"epizootiologies"],
+            [46 ,"foolhardinesses"], [47 ,"cryptozoologies"], [48 ,"cryptozoologist"], [49 ,"cooperationists"],
+            [50 ,"cooperativeness"], [51 ,"bloodguiltiness"], [52 ,"bloodlessnesses"], [53 ,"weatherproofing"],
+            [54 ,"troubleshooters"], [55 ,"troubleshooting"], [56 ,"toothsomenesses"], [57 ,"zoogeographical"],
+            [58 ,"protozoologists"], [59 ,"paleozoologists"], [60 ,"paleozoological"], [61 ,"outdoorsmanship"],
+            [62 ,"photooxidations"], [63 ,"schoolmasterish"] ];
+
+        return dados.filter(function (value) {
+            return value[1].indexOf(elem.dataset.value) !== -1;
+        });
+    }
+
+
+
+
+    //Activate/Deactivate components
+    function activateDeactivate() {
+        for (var i = 0; i < elems.length; i++) {
+            elems[i].disabled = !elems[i].disabled;
+            elems[i].component.update();
+        }
+    }
+
+    //Remove/Insert errors of input components
+    function showHideError() {
+        for (var i = 0; i < elems.length; i++) {
+            var elem = elems[i];
+            if (elem.id === "") {
+                continue;
+            }
+
+            var errorElem;
+            var type = Scaliby.getComponentType(elems[i]);
+            if (type === Scaliby.COMPONENT_TYPE.CHECK_BOX || type === Scaliby.COMPONENT_TYPE.RADIO_BOX) {
+                errorElem = elems[i].component.getContainer();
+            } else {
+                errorElem = elem;
+            }
+
+            if (errorElem.dataset.error === "") {
+                errorElem.dataset.error = "Error Message";
+            } else {
+                errorElem.dataset.error = "";
+            }
+
+            elem.component.update();
+        }
+    }
+
+    //Show/Hide input components
+    function showHideInput() {
+        for (var i = 0; i < elems.length; i++) {
+            var elem = elems[i];
+            if (elem.id === "") {
+                continue;
+            }
+
+            var errorElem;
+            var type = Scaliby.getComponentType(elems[i]);
+            if (type === Scaliby.COMPONENT_TYPE.CHECK_BOX || type === Scaliby.COMPONENT_TYPE.RADIO_BOX) {
+                errorElem = elems[i].component.getContainer();
+            } else {
+                errorElem = elem;
+            }
+
+            if (errorElem.dataset.visible === "false") {
+                errorElem.dataset.visible = "true";
+            } else {
+                errorElem.dataset.visible = "false";
+            }
+            elem.component.update();
+        }
+    }
+
+    //Remove/Insert mandatory information
+    function removeInsertMandatory() {
+        for (var i = 0; i < elems.length; i++) {
+            var type = Scaliby.getComponentType(elems[i]);
+            if (type === Scaliby.COMPONENT_TYPE.CHECK_BOX || type === Scaliby.COMPONENT_TYPE.RADIO_BOX) {
+                var groupElem = elems[i].component.getContainer();
+                var required = groupElem.dataset.required;
+                groupElem.dataset.required = required === "true" ? "false" : "true";
+            } else {
+                elems[i].required = !elems[i].required;
+            }
+
+            elems[i].component.update();
+        }
+    }
+
+    //Show the input values
+    function seeValues() {
+        for (var i = 0; i < elems.length; i++) {
+            if (elems[i].name) {
+                console.log(elems[i].name + " = " + Form.getValueByElement(elems[i]));
+            }
+        }
+        console.log("--------------------------------------------------------");
+    }
+
+    //Salve the input values
+    function saveValues() {
+        Form.saveValues("frm_input");
+        alert("Values saved.");
+    }
+
+    //Recover the input values
+    function recoverValues() {
+        Form.recoverValues("frm_input");
+    }
+
+    //Show suggestions
+    function showSuggestion() {
+        Hint.show([
+            {target: Form.getField("frm_input", "input1"), values: ["Text 1", null]},
+            {target: Form.getField("frm_input", "input2"), values: ["11111-22222-33333", null]},
+            {target: Form.getField("frm_input", "input3"), values: ["Text 2", null]},
+            {target: Form.getField("frm_input", "input4"), values: ["01/02/2003", null]},
+            {target: Form.getField("frm_input", "input5"), values: ["10:30", null]},
+            {target: Form.getField("frm_input", "input6"), values: ["Text 3\nwith wrap\nof line.", null]},
+            {target: Form.getField("frm_input", "input7"), values: ["Yes", true]},
+            {target: Form.getField("frm_input", "input8"), values: ["Option B", "Op 2"]},
+            {target: Form.getField("frm_input", "input9"), values: ["Option E", "Op 5", "Option F", "Op 6"]},
+            {target: Form.getField("frm_input", "input10"), values: ["Option 5", "5"]},
+            {target: Form.getField("frm_input", "input11"), values: ["Option 333", "333", "Option CCC", "CCC"]},
+            {target: Form.getField("frm_input", "input12"), values: ["door", 3]}
+        ]);
+    }
+</script>
+
+
+<!-- *************************************************************************************************************** -->
+<!-- *************************************************** BUTTON **************************************************** -->
+<!-- *************************************************************************************************************** -->
+<div id="div_button">
+    <div class="s-grid">
+        <div class="s-cell-12" style="background-color:#f0f0ff">
+            <!-- Button -->
+            <div class="s-grid">
+                <div class="s-cell-1">
+                    <button class="s-button">Raised</button>
+                </div>
+                <div class="s-cell-2">
+                    <button class="s-button" data-mode="unelevated">Unelevated</button>
+                </div>
+                <div class="s-cell-1">
+                    <button class="s-button" data-mode="outlined">Outlined</button>
+                </div>
+                <div class="s-cell-1">
+                    <button class="s-button" data-mode="text">Text</button>
+                </div>
+                <div class="s-cell-2">
+                    <button class="s-button" data-right-icon="done">Icon On The Right</button>
+                </div>
+                <div class="s-cell-2">
+                    <button class="s-button" data-left-icon="clear">Icon On The Left</button>
+                </div>
+                <div class="s-cell-2">
+                    <button class="s-button" disabled>Disable/Enable</button>
+                </div>
+                <div class="s-cell-1">
+                    <button class="s-button s-theme-secondary">Secondary</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="s-cell-12" style="background-color:#f0f0ff">
+            <!-- Float Button -->
+            <div class="s-grid">
+                <div class="s-cell-1">
+                    <button class="s-float-button" data-type="normal" data-icon="favorite"></button>
+                </div>
+                <div class="s-cell-1">
+                    <button class="s-float-button" data-type="mini" data-icon="favorite"></button>
+                </div>
+                <div class="s-cell-1">
+                    <button class="s-float-button" data-type="extended" data-icon="clear">Clear</button>
+                </div>
+                <div class="s-cell-1">
+                    <button class="s-float-button s-theme-primary" data-icon="favorite"></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="s-cell-12" style="background-color:#f0f0ff">
+            <!-- Icon Button -->
+            <div class="s-grid">
+                <div class="s-cell-1">
+                    <button class="s-icon-button" data-icon="wifi"></button>
+                </div>
+                <div class="s-cell-3">
+                    <button id="idIconButton" class="s-icon-button" data-icon="favorite_border" data-icon-on="favorite"></button>
+                    &nbsp;<button onclick="alert(document.getElementById('idIconButton').component.getState())">See State</button>
+                    &nbsp;<button onclick="var b = document.getElementById('idIconButton'); b.component.setState(!b.component.getState())">Toggle State</button>
+                </div>
+                <div class="s-cell-1">
+                    <button class="s-icon-button" data-icon="wifi" disabled></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chip -->
+        <div class="s-cell-12" style="background-color:#f0f0ff">
+            <div class="s-chip" data-text="Text of chip"></div>
+            <div class="s-chip" data-icon="face" data-text="Icon (left)"></div>
+            <div class="s-chip" data-icon="face" data-align="right" data-text="Icon (right)"></div>
+            <div class="s-chip" data-image="https://material.io/develop/images/material-logo.svg" data-text="Image (left)"></div>
+            <div class="s-chip" data-image="https://material.io/develop/images/material-logo.svg" data-align="right" data-text="Image (right)"></div>
+            <div class="s-chip" data-text="With focus" data-focusable="true"></div>
+            <div class="s-chip" id="chip" data-icon="cancel" data-align="right" data-text="Icon with event"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //Treats click event on Chip component
+    document.getElementById("chip").addEventListener("click", function(event) {
+        if (event.target.tagName === "I") {
+            alert("Click on Icon");
+        } else {
+            alert("Click on Chip");
+        }
+    });
+</script>
+
+
+<!-- *************************************************************************************************************** -->
+<!-- *************************************************** PANEL ***************************************************** -->
+<!-- *************************************************************************************************************** -->
+<div id="div_panel">
+    <div class="s-grid">
+        <!-- Card -->
+        <div class="s-cell-3" style="background-color:#f0f0ff">
+            <div class="s-card">
+                <img style="height: 300px" src="https://material-components.github.io/material-components-web-catalog/static/media/photos/3x2/2.jpg">
+                <button class="s-card-button">Read</button>
+                <button class="s-card-icon">share</button>
+                <button class="s-card-icon">more_vert</button>
+                <div>
+                    <span class="mdc-typography--headline6">Card</span><br><span class="mdc-typography">Content of card.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel -->
+        <div class="s-cell-3" style="background-color:#f0f0ff">
+            <div class="s-grid">
+                <div class="s-cell-12">
+                    <div class="s-panel" data-title="Panel Title" style="height: 100px">
+                        <div class="mdc-typography" style="padding:10px">Content of panel</div>
+                    </div>
+                </div>
+                <div class="s-cell-12">
+                    <div class="s-panel s-theme-primary" data-title="Panel Title" style="height: 100px">
+                        <div class="mdc-typography" style="padding:10px">Content of panel</div>
+                    </div>
+                </div>
+                <div class="s-cell-12">
+                    <div class="s-panel s-theme-secondary" data-title="Panel Title" style="height: 100px">
+                        <div class="mdc-typography" style="padding:10px">Content of panel</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab -->
+        <div class="s-cell-6" style="background-color:#f0f0ff">
+            <div class="s-grid">
+                <div class="s-cell-12">
+                    <div class="s-tab">
+                        <div id="tab1" data-title="Title"></div>
+                        <div id="tab2" data-icon="favorite"></div>
+                        <div id="tab3" data-title="Left" data-icon="keyboard_arrow_left"></div>
+                        <div id="tab4" data-selected="true" data-title="Right" data-icon="keyboard_arrow_right" data-icon-align="right"></div>
+                    </div>
+                </div>
+                <div class="s-cell-12">
+                    <div class="s-tab s-theme-primary" style="background-color: peru">
+                        <div id="tab11" data-title="Title" data-selected="true"></div>
+                        <div id="tab12" data-icon="favorite"></div>
+                        <div id="tab13" data-title="Left" data-icon="keyboard_arrow_left"></div>
+                        <div id="tab14" data-title="Right" data-icon="keyboard_arrow_right" data-icon-align="right"></div>
+                    </div>
+                </div>
+                <div class="s-cell-12">
+                    <div class="s-tab s-theme-secondary" style="background-color: #e0e0e0">
+                        <div id="tab21" data-title="Title" data-selected="true" style="padding: 20px">Content of tab "Title"</div>
+                        <div id="tab22" data-icon="favorite" style="padding: 20px">Content of tab "Favorite"</div>
+                        <div id="tab23" data-title="Left" data-icon="keyboard_arrow_left" style="padding: 20px">Content of tab "Left"</div>
+                        <div id="tab24" data-title="Right" data-icon="keyboard_arrow_right" data-icon-align="right" style="padding: 20px">Content of tab "Right"</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="s-cell-3" style="background-color:#f0f0ff">
+            <div class="s-panel" data-title="Divider">
+                <div class="s-grid">
+                    <div class="s-cell-12">
+                        Content 1
+                    </div>
+                    <div class="s-cell-12">
+                        <div class="s-divider" data-color="#ff0000" data-height="2px"></div>
+                    </div>
+                    <div class="s-cell-12">
+                        Content 2
+                    </div>
+                    <div class="s-cell-12">
+                        <div class="s-divider"></div>
+                    </div>
+                    <div class="s-cell-12">
+                        Content 3
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ********************************************************************************************************** -->
+<!-- *********************************************** LIST ***************************************************** -->
+<!-- ********************************************************************************************************** -->
+<div id="div_list">
+    <div class="s-grid">
+        <!-- List -->
+        <div class="s-cell-3" style="background-color:#f0f0ff">
+            <b>List</b><br><br>
+            <button onclick="alert(document.getElementById('idList').component.getSelected())">See Selected</button>
+            <button onclick="document.getElementById('idList').component.setSelected(['one', 'three'])">Do Selection</button>
+            <button onclick="newList()">New Options</button>
+
+            <ul id="idList" class="s-list" data-selection-type="single" data-left-icon-class="" data-left-img-class="list-image"
+                data-right-icon-class="" data-right-img-class="list-image">
+                <li value="one" onclick="clickOnList(event)">Item One</li>
+                <li value="two">Item Two <hr> Secondary Text</li>
+                <li value="three" data-left-icon="wifi">Item Three <hr> Secondary Text</li>
+                <li value="four" data-selected="true" data-right-icon="star">Item Four <hr> Secondary Text</li>
+                <li value="five" data-left-icon="wifi" data-right-icon="star">Item Five <hr> Secondary Text</li>
+                <li data-type="separator"></li>
+                <li value="six"
+                    data-img="https://material-components.github.io/material-components-web-catalog/static/media/photos/3x2/4.jpg">
+                    Item Six <hr> Secondary Text</li>
+                <li value="seven"
+                    data-left-img="https://material-components.github.io/material-components-web-catalog/static/media/photos/3x2/4.jpg"
+                    data-left-icon="folder"
+                    data-right-icon="favorite">
+                    Item Seven <hr> Secondary Text</li>
+                <li value="eight"
+                    data-left-icon="folder"
+                    data-right-icon="favorite"
+                    data-right-img="https://material-components.github.io/material-components-web-catalog/static/media/photos/3x2/4.jpg">
+                    Item Eight <hr> Secondary Text</li>
+
+                <li data-type="separator"></li>
+
+                <li data-type="start-sublist">Sublist A
+                <li>Sub A - One</li>
+                <li>Sub A - Two</li>
+                <li data-type="start-sublist">Sublist B
+                <li>Sub B - One</li>
+                <li>Sub B - Two</li>
+                <li data-type="end-sublist">X
+                <li>Sub A - Three</li>
+                <li data-type="end-sublist">X
+
+                <li value="ten">Item Ten <hr> Secondary Text</li>
+            </ul>
+        </div>
+
+        <!-- Menu -->
+        <div class="s-cell-1" style="background-color:#f0f0ff">
+            <b>Menu</b><br><br>
+            <button onclick="newMenu()">New Options</button><br><br>
+            <button class="s-button" id="idMenuButton" onclick="document.getElementById('idMenu').component.open();">Open Menu</button>
+
+            <ul id="idMenu" class="s-menu" data-over="idMenuButton" data-selection-type="single" data-left-icon-class=""
+                data-left-img-class="list-image" data-right-icon-class="" data-right-img-class="list-image">
+                <li onclick="clickOnMenu(1)">Item One</li>
+                <li onclick="clickOnMenu(2)">Item Two</li>
+                <li data-left-icon="wifi" onclick="clickOnMenu(3)">Item Three</li>
+                <li data-right-icon="star" onclick="clickOnMenu(4)">Item Four</li>
+                <li data-command="Ctrl + A" onclick="clickOnMenu(5)">Item Five</li>
+                <li data-left-img="https://material-components.github.io/material-components-web-catalog/static/media/photos/3x2/4.jpg" onclick="clickOnMenu(6)">
+                    Item Six</li>
+                <li data-right-img="https://material-components.github.io/material-components-web-catalog/static/media/photos/3x2/4.jpg" onclick="clickOnMenu(7)">
+                    Item Seven</li>
+                <li data-type="separator"></li>
+                <li data-left-icon="wifi"
+                    data-left-img="https://material-components.github.io/material-components-web-catalog/static/media/photos/3x2/4.jpg"
+                    data-right-icon="star"
+                    data-right-img="https://material-components.github.io/material-components-web-catalog/static/media/photos/3x2/4.jpg"
+                    data-command="Ctrl + A"
+                    onclick="clickOnMenu(8)">
+                    Eight</li>
+            </ul>
+        </div>
+
+        <!-- Listing -->
+        <div class="s-cell-8" style="background-color:#f0f0ff">
+            <div class="s-grid">
+
+<!-- ======================================================== -->
+
+<div class="s-cell-12" style="background-color:#f0f0ff">
+    <!-- ? -->
+    <table class="s-listing" id="dynamicListing" data-source="javascript:getListingDatasource()" data-oncreated="createColumns()">
+    </table>
+</div>
+
+<script>
+    function createColumns() {
+        var columns = [
+            {title: "Date", name: "date"},
+            {title: "Salesman", name: "salesman"},
+            {title: "Item", name: "item"},
+            {title: "Quantity", name: "quantity"},
+            {title: "Unity Cost", name: "unityCost"},
+            {title: "Total", name: "total", align: "center"}
+        ];
+        document.getElementById("dynamicListing").component.setColumns(columns);
+    }
+</script>
+
+<!-- ======================================================== -->
+
+                <div class="s-cell-12" style="background-color:#f0f0ff">
+                    <!-- Normal -->
+<button type="button" onclick="Scaliby.getComponent('idListing').setRowsPerPage(5)">!</button>
+                    <table class="s-listing" id="idListing" data-type="mult" data-source="javascript:getListingDatasource()"
+                        data-filter="javascript:alert('filter')">
+                        <thead>
+                        <tr>
+                            <th data-name="date">Date</th>
+                            <th data-name="salesman">Salesman</th>
+                            <th data-name="item">Item</th>
+                            <th data-name="quantity">Quantity</th>
+                            <th data-name="unityCost">Unity Cost</th>
+                            <th data-name="total" data-align="center">Total</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+
+                <div class="s-cell-12" style="background-color:#f0f0ff">
+                    <!-- Different style -->
+                    <table class="s-listing" id="idListing2" data-type="single"
+                           data-cellclass="cell" data-source="javascript:getListingDatasource2()">
+                        <thead>
+                        <tr>
+                            <th data-name="col1">C01</th>
+                            <th data-name="col2">C02</th>
+                            <th data-name="col3">C03</th>
+                            <th data-name="col4">C04</th>
+                            <th data-name="col5">C05</th>
+                            <th data-name="col6">C06</th>
+                            <th data-name="col7">C07</th>
+                            <th data-name="col8">C08</th>
+                            <th data-name="col9">C09</th>
+                            <th data-name="col10">C10</th>
+                            <th data-name="col11">C11</th>
+                            <th data-name="col12">C12</th>
+                            <th data-name="col13">C13</th>
+                            <th data-name="col14">C14</th>
+                            <th data-name="col15">C15</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function newList() {
+        var items = [
+            {text: "Item AAA", value: "A", clickFunc: clickOnList},
+            {text: "Sublist", startSublist: true},
+            {text: "Item Sub A", value: "SA"},
+            {text: "Item Sub B", value: "SB"},
+            {text: "Sublist", endSublist: true},
+            {text: "Item BBB", value: "B"},
+            {separator: true},
+            {text: "Item CCC", value: "C", leftIcon: "star", rightIcon: "favorite"},
+            {group: "Group"},
+            {text: "Item DDD", value: "D", selected: true, leftImg: "https://material-components.github.io/material-components-web-catalog/static/media/photos/3x2/4.jpg"}
+        ];
+        document.getElementById("idList").component.setItems(items);
+    }
+
+    function newMenu() {
+        var items = [
+            {text: "Item 1"},
+            {text: "Item 2",  leftIcon: "star", rightIcon: "favorite"},
+            {separator: true},
+            {text: "Item 3", leftImg: "https://material-components.github.io/material-components-web-catalog/static/media/photos/3x2/4.jpg", rightImg: "https://material-components.github.io/material-components-web-catalog/static/media/photos/3x2/4.jpg"},
+            {text: "Item 4", command: "Alt + Z", onclick: "alert('Clicked!')"}
+        ];
+        document.getElementById("idMenu").component.setItems(items);
+    }
+
+    function clickOnList(event) {
+        var item = event.currentTarget;
+        console.log("Item element = ", item);
+        alert("Value of item = " + item.getAttribute("value"));
+    }
+
+    function clickOnMenu(number) {
+        alert("Item = " + number);
+    }
+
+    function getListingDatasource() {
+        return { msg: "This is a test",  rows: [
+            { date:"2018/01/06", salesman:"Jones", item:"Pencil", quantity:95, unityCost:1.99, total:189.05},
+            { date:"2018/01/23", salesman:"Kivell", item:"Binder", quantity:50, unityCost:19.99, total:999.5},
+            { date:"2018/02/09", salesman:"Jardine", item:"Pencil", quantity:36, unityCost:4.99, total:179.64},
+            { date:"2018/02/26", salesman:"Gill", item:"Pen", quantity:27, unityCost:19.99, total:539.73},
+            { date:"2018/03/15", salesman:"Sorvino", item:"Pencil", quantity:56, unityCost:2.99, total:167.44},
+            { date:"2018/04/01", salesman:"Jones", item:"Binder", quantity:60, unityCost:4.99, total:299.4},
+            { date:"2018/04/18", salesman:"Andrews", item:"Pencil", quantity:75, unityCost:1.99, total:149.25},
+            { date:"2018/05/05", salesman:"Jardine", item:"Pencil", quantity:90, unityCost:4.99, total:449.1},
+            { date:"2018/05/22", salesman:"Thompson", item:"Pencil", quantity:32, unityCost:1.99, total:63.68},
+            { date:"2018/06/08", salesman:"Jones", item:"Binder", quantity:60, unityCost:8.99, total:539.4},
+            { date:"2018/06/25", salesman:"Morgan", item:"Pencil", quantity:90, unityCost:4.99, total:449.1},
+            { date:"2018/07/12", salesman:"Howard", item:"Binder", quantity:29, unityCost:1.99, total:57.71},
+            { date:"2018/07/29", salesman:"Parent", item:"Binder", quantity:81, unityCost:19.99, total:1619.19},
+            { date:"2018/08/15", salesman:"Jones", item:"Pencil", quantity:35, unityCost:4.99, total:174.65},
+            { date:"2018/09/01", salesman:"Smith", item:"Desk", quantity:2, unityCost:125, total:250},
+            { date:"2018/09/18", salesman:"Jones", item:"Pen Set", quantity:16, unityCost:15.99, total:255.84},
+            { date:"2018/10/05", salesman:"Morgan", item:"Binder", quantity:28, unityCost:8.99, total:251.72},
+            { date:"2018/10/22", salesman:"Jones", item:"Pen", quantity:64, unityCost:8.99, total:575.36},
+            { date:"2018/11/08", salesman:"Parent", item:"Pen", quantity:15, unityCost:19.99, total:299.85},
+            { date:"2018/11/25", salesman:"Kivell", item:"Pen Set", quantity:96, unityCost:4.99, total:479.04},
+            { date:"2018/12/12", salesman:"Smith", item:"Pencil", quantity:67, unityCost:1.29, total:86.43},
+            { date:"2018/12/29", salesman:"Parent", item:"Pen Set", quantity:74, unityCost:15.99, total:1183.26},
+            { date:"2019/01/15", salesman:"Gill", item:"Binder", quantity:46, unityCost:8.99, total:413.54},
+            { date:"2019/02/01", salesman:"Smith", item:"Binder", quantity:87, unityCost:15, total:1305},
+            { date:"2019/02/18", salesman:"Jones", item:"Binder", quantity:4, unityCost:4.99, total:19.96},
+            { date:"2019/03/07", salesman:"Sorvino", item:"Binder", quantity:7, unityCost:19.99, total:139.93},
+            { date:"2019/03/24", salesman:"Jardine", item:"Pen Set", quantity:50, unityCost:4.99, total:249.5},
+            { date:"2019/04/10", salesman:"Andrews", item:"Pencil", quantity:66, unityCost:1.99, total:131.34},
+            { date:"2019/04/27", salesman:"Howard", item:"Pen", quantity:96, unityCost:4.99, total:479.04},
+            { date:"2019/05/14", salesman:"Gill", item:"Pencil", quantity:53, unityCost:1.29, total:68.3}
+        ] };
+    }
+
+/////////////////////
+/*
+$("#idListing").DataTable({
+    "columns": [
+        { "data": "date" },
+        { "data": "salesman" },
+        { "data": "item" },
+        { "data": "quantity" },
+        { "data": "unityCost" },
+        { "data": "total" }
+    ],
+
+    "ajax" : function (data, callback) {
+        callback({"data": getListingDatasource()})
+    },
+
+    scrollX:        true,
+    fixedColumns:   true
+
+    //scrollX: 100
+});
+*/
+//////////////////////
+
+function getListingDatasource2() {
+        return { rows: [
+            { col1: "1", col2: "2", col3: "3", col4: "4", col5: "5", col6: "6", col7:"7", col8:"8", col9:"9", col10:"10", col11:"11" , col12:"12" , col13:"13" , col14:"14" , col15:"15"},
+            { col1: "101", col2: "102", col3: "103", col4: "104", col5: "105", col6: "106", col7:"107", col8:"108", col9:"109", col10:"1010", col11:"1011" , col12:"1012" , col13:"1013" , col14:"1014" , col15:"1015"},
+            { col1: "201", col2: "202", col3: "203", col4: "204", col5: "205", col6: "206", col7:"207", col8:"208", col9:"209", col10:"2010", col11:"2011" , col12:"2012" , col13:"2013" , col14:"2014" , col15:"2015"},
+            { col1: "301", col2: "302", col3: "303", col4: "304", col5: "305", col6: "306", col7:"307", col8:"308", col9:"309", col10:"3010", col11:"3011" , col12:"3012" , col13:"3013" , col14:"3014" , col15:"3015"},
+            { col1: "401", col2: "402", col3: "403", col4: "404", col5: "405", col6: "406", col7:"407", col8:"408", col9:"409", col10:"4010", col11:"4011" , col12:"4012" , col13:"4013" , col14:"4014" , col15:"4015"},
+            { col1: "501", col2: "502", col3: "503", col4: "504", col5: "505", col6: "506", col7:"507", col8:"508", col9:"509", col10:"5010", col11:"5011" , col12:"5012" , col13:"5013" , col14:"5014" , col15:"5015"},
+            { col1: "601", col2: "602", col3: "603", col4: "604", col5: "605", col6: "606", col7:"607", col8:"608", col9:"609", col10:"6010", col11:"6011" , col12:"6012" , col13:"6013" , col14:"6014" , col15:"6015"},
+            { col1: "701", col2: "702", col3: "703", col4: "704", col5: "705", col6: "706", col7:"707", col8:"708", col9:"709", col10:"7010", col11:"7011" , col12:"7012" , col13:"7013" , col14:"7014" , col15:"7015"},
+            { col1: "801", col2: "802", col3: "803", col4: "804", col5: "805", col6: "806", col7:"807", col8:"808", col9:"809", col10:"8010", col11:"8011" , col12:"8012" , col13:"8013" , col14:"8014" , col15:"8015"},
+            { col1: "901", col2: "902", col3: "903", col4: "904", col5: "905", col6: "906", col7:"907", col8:"908", col9:"909", col10:"9010", col11:"9011" , col12:"9012" , col13:"9013" , col14:"9014" , col15:"9015"},
+        ] };
+    }
+
+</script>
+
+
+<!-- ********************************************************************************************************** -->
+<!-- ********************************************** OTHERS **************************************************** -->
+<!-- ********************************************************************************************************** -->
+<div id="div_others">
+    <div class="s-grid">
+        <!-- Dialog -->
+        <div class="s-cell-3" style="background-color:#f0f0ff">
+            <button class="s-button" onclick="dialogOk()">OK Dialog</button>
+            <button class="s-button" onclick="dialogConfirm()">Confirmation Dialog</button>
+        </div>
+
+        <!-- Drawer -->
+        <div class="s-cell-4" style="background-color:#f0f0ff">
+            <button id="changeToRemovableDrawer" class="s-button">Removable Drawer</button>
+            <button id="changeToModalDrawer" class="s-button">Model Drawer</button>
+        </div>
+
+        <!-- Alert -->
+        <div class="s-cell-5" style="background-color:#f0f0ff">
+            <button class="s-button" onclick="showAlert(1)">Success Alert</button>
+            <button class="s-button" onclick="showAlert(2)">Info Alert</button>
+            <button class="s-button" onclick="showAlert(3)">Warning Alert</button>
+            <button class="s-button" onclick="showAlert(4)">Error Alert</button>
+        </div>
+
+        <!-- Tips -->
+        <div id="abc" class="s-cell-2" style="background-color:#f0f0ff">
+            <button id="showTips" class="s-button">Show Tips</button>
+        </div>
+
+        <!-- Progress -->
+        <div class="s-cell-4" style="background-color:#f0f0ff">
+            <div class="s-grid">
+                <div class="s-cell-3">
+                    <button class="s-button" onclick="startProgress('progress1')">Start</button>
+                </div>
+                <div class="s-cell-9">
+                    <div id="progress1" class="s-progress"></div>
+                </div>
+            </div>
+
+            <div class="s-grid">
+                <div class="s-cell-3">
+                    <button class="s-button" onclick="startProgress('progress2')">Start</button>
+                </div>
+                <div class="s-cell-9">
+                    <div id="progress2" class="s-progress" data-buffering="0.7"></div>
+                </div>
+            </div>
+
+            <div class="s-grid">
+                <div class="s-cell-3">
+                    <button class="s-button" onclick="startProgress('progress3')">Start</button>
+                </div>
+                <div class="s-cell-9">
+                    <div id="progress3" class="s-progress" data-reversed="true"></div>
+                </div>
+            </div>
+
+            <div class="s-grid">
+                <div class="s-cell-4">
+                    <button class="s-button" onclick="showHideProgress('progress4')">Show/Hide</button>
+                </div>
+                <div class="s-cell-8">
+                    <div id="progress4" class="s-progress" data-indeterminate="true"></div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function startProgress(id) {
+        var value = 0;
+        var interval = setInterval(function() {
+            value += 0.1;
+            Scaliby.getComponent(id).setProgress(value);
+            if (value >= 1) {
+                clearInterval(interval);
+            }
+        }, 1000);
+    }
+
+    function showHideProgress(id) {
+        var comp = Scaliby.getComponent(id);
+        if (comp.isVisible()) {
+            comp.hide();
+        } else {
+            comp.show();
+        }
+    }
+
+
+    function dialogOk() {
+
+var div = document.createElement("div");
+div.id="divTeste";
+$(div).html("<input class='s-input' name='c1' data-label='Field 1'><input class='s-input' name='c2' data-label='Field 2'><br><input class='s-input' name='c3' data-label='Field 3'><input class='s-input' name='c4' data-label='Field 4'>" +
+        "<script>console.log('OK!');<" + "/script>");
+
+Dialog.showOk("Message Title", div, function() { alert("OK!"); });
+
+Scaliby.createComponents(div.id);
+
+        //Dialog.showOk("Message Title", "This dialog show the button [OK].", function() { alert("OK!"); });
+    }
+
+    function dialogConfirm() {
+        Dialog.showConfirmation("Confirmation Title", "This dialog show the buttons [Accept] and [Decline].",
+            function() { alert("Accept!"); },
+            function() { alert("Decline!"); }
+        );
+    }
+
+    document.getElementById("changeToRemovableDrawer").addEventListener("click", function () {
+        var elem = document.getElementById("drawer");
+        elem.dataset.type = "removable";
+        elem.component.update();
+    });
+
+    document.getElementById("changeToModalDrawer").addEventListener("click", function () {
+        var elem = document.getElementById("drawer");
+        elem.dataset.type = "modal";
+        elem.component.update();
+    });
+
+    document.getElementById("showTips").addEventListener("click", function () {
+        new Tip({
+            id: "tip1",
+            target: "showTips",
+            text: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+            width: "300px",
+            seconds: 0,//10,
+            linkAction: "/"
+        });
+    });
+
+    showAlert = function(type) {
+        if (type === 1) {
+            Alert.showSuccess("Success Message.", 2);
+        } else if (type === 2) {
+            Alert.showInfo("Information Message.", 3);
+        } else if (type === 3) {
+            Alert.showWarning("Warning Message.", 4);
+        } else {
+            Alert.showError("Error Message.", 5);
+        }
+    }
+</script>
+
+
+<!-- *************************************************************************************************************** -->
+<!-- ********************************************* GENERAL JAVASCRIPT ********************************************** -->
+<!-- *************************************************************************************************************** -->
+<script>
+    //Put the content in their tabs
+    document.getElementById("tab_input").appendChild(document.getElementById("frm_input"));
+    document.getElementById("tab_button").appendChild(document.getElementById("div_button"));
+    document.getElementById("tab_panel").appendChild(document.getElementById("div_panel"));
+    document.getElementById("tab_list").appendChild(document.getElementById("div_list"));
+    document.getElementById("tab_others").appendChild(document.getElementById("div_others"));
+
+    //Create the components 10 times to verify for possible faults
+    for (let i = 0; i < 10; i++) {
+        Scaliby.createComponents();
+    }
+
+</script>
+
+</body>
+</html>
