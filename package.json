@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/digitalcrewbr/scaliby.git"
+    "url": "git+https://github.com/DigitalCrew/scaliby.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://gitlab.com/digitalcrewbr/scaliby/issues"
+    "url": "https://github.com/DigitalCrew/scaliby/issues"
   },
-  "homepage": "https://gitlab.com/digitalcrewbr/scaliby#readme",
+  "homepage": "https://github.com/DigitalCrew/scaliby#readme",
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/plugin-proposal-class-properties": "^7.5.5",

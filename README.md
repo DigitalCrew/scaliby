@@ -27,7 +27,6 @@ features:
 ## Quick Start
 Run these commands to set up the project:
 * Clone the repo: `git clone https://github.com/DigitalCrew/scaliby.git`
-* Configure the **node** in the project: `npm init -y`
 * Install the modules: `npm install --save-dev gulp gulp-babel gulp-plumber gulp-concat gulp-uglify gulp-webserver gulp-clean-css @babel/core @babel/preset-env @babel/plugin-proposal-class-properties` 
 
 Commands:
