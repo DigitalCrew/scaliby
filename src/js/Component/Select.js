@@ -54,8 +54,7 @@ class Select {
         //Create the main element
         this._main = Base.createElement({
             tag: "div",
-            classes: ["mdc-select", "mdc-select--box", "input-fullwidth"],
-            styles: ["height", "40px"],
+            classes: ["mdc-select", "input-fullwidth"],
             parent: this._container
         });
 
@@ -71,7 +70,7 @@ class Select {
         Base.configElement(this._elem, {
             generateId: true,
             classes: ["mdc-select__native-control"],
-            styles: ["height", "40px", "padding-top", "14px", "padding-bottom", "0px"],
+            styles: ["height", "40px", "padding-top", "13px", "padding-bottom", "0px"],
             parent: this._main
         });
 
@@ -81,7 +80,6 @@ class Select {
             id: this._elem.id + "_label",
             content: this._elem.dataset.label,
             classes: ["mdc-floating-label"],
-            styles: ["top", "5px"],
             attrs: ["for", this._elem.id],
             parent: this._main
         });

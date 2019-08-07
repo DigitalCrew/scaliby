@@ -47,10 +47,16 @@
 }
 
 /* Select */
-.mdc-select--box .mdc-floating-label--float-above {
-    -webkit-transform:translateY(-25%) scale(.75);
-    -ms-transform:translateY(-25%) scale(.75);
-    transform:translateY(-25%) scale(.75)
+.mdc-select {
+    height: 40px;
+}
+.mdc-select .mdc-floating-label {
+    top: 10px;
+}
+.mdc-select .mdc-floating-label--float-above {
+    -webkit-transform:translateY(-48%) scale(.75);
+    -ms-transform:translateY(-48%) scale(.75);
+    transform:translateY(-48%) scale(.75)
 }
 
 
@@ -276,7 +282,7 @@ body {
 .multiselect-arrow {
     color: rgba(0,0,0,.5);
     cursor: pointer;
-    padding: 8px 0px 8px 0px;
+    padding: 8px 0px 9px 0px;
 }
 .multiselect-line-focus {
     border-bottom-color: rgba(98,0,238,0.87) !important;

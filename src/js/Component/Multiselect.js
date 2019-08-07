@@ -200,7 +200,7 @@ class Multiselect {
             id: this._elem.id + "_label",
             classes: ["mdc-floating-label"],
             attrs: ["for", this._elem.id],
-            styles: ["cursor", "pointer", "position", "absolute", "top", "11px", "bottom", "12px"],
+            styles: ["cursor", "pointer", "position", "absolute", "top", "10px", "bottom", "12px"],
             parent: this._div
         });
 
