@@ -58,12 +58,19 @@ class Alert {
             classes[classes.length] = "alert-message-error";
         }
 
-        //Create the element with message
+        //Create the element that contains message and button
         let div = Base.createElement({
             tag: "div",
             classes: classes,
-            content: message.text,
             parent: Alert._container
+        });
+
+        //Create the element with message
+        let msgDiv = Base.createElement({
+            tag: "div",
+            classes: ["alert-message-text", "vcenter"],
+            content: message.text,
+            parent: div
         });
 
         //Timer to close the message
@@ -77,10 +84,10 @@ class Alert {
         //Create icon to close the message
         Base.createElement({
             tag: "i",
-            classes: ["material-icons", "alert-icon"],
+            classes: ["material-icons", "alert-icon", "vcenter"],
             content: "close",
             events: ["click", function() { Alert._close(div, timeout); }],
-            parent: div
+            parent: msgDiv
         });
 
         //Show message
