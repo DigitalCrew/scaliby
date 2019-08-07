@@ -223,7 +223,7 @@ class List {
                     withinSublist++;
                 } else if (items[i].dataset.type === "end-sublist") {
                     //Item that end sublist
-                    leftPadding = leftPadding.substring(0, "&nbsp;&nbsp;".length);
+                    leftPadding = leftPadding.substring(0, leftPadding.length - "&nbsp;&nbsp;".length);
                     items[i].style.display = "none";
                     withinSublist--;
                 } else {
