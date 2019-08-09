@@ -469,39 +469,6 @@ class Scaliby {
     }
 
     /**
-     * Create the loading spinner component.
-     *
-     * @param {number} size The size of spinner:
-     *                      1- Small;
-     *                      2- Normal;
-     *                      3- Large.
-     *
-     * @returns {Object} element of loading spinner.
-     */
-    static createLoadingSpinner(size) {
-        let pixels;
-        switch (size) {
-            case 1:
-                pixels = 16;
-                break;
-
-            case 2:
-                pixels = 32;
-                break;
-
-            default:
-                pixels = 64;
-        }
-
-        let div = document.createElement("span");
-        div.innerHTML = "<svg class='spinner' width='" + pixels + "px' height='" + pixels +
-            "px' viewBox='0 0 66 66'>" +
-            "<circle class='spinner-path' fill='none' stroke-width='6' stroke-linecap='round' " +
-            "cx='33' cy='33' r='30'></circle></svg>";
-        return div;
-    }
-
-    /**
      * Displays the element if has content. Otherwise, hide it.
      *
      * @param {string} selector jQuery selector that identify the element

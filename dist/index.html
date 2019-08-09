@@ -142,7 +142,7 @@
 
         <div class="s-cell-3" style="background-color:#f0f0ff">
             <!-- Select -->
-            <select class="s-input" name="input10" data-label="Only Layout" required data-error="Error Message">
+            <select class="s-input" name="input10" data-label="Select" required data-error="Error Message">
                 <option value=""></option>
                 <optgroup label="Numbers">
                     <option value="0">Option 1</option>
@@ -645,33 +645,9 @@
         <div class="s-cell-8" style="background-color:#f0f0ff">
             <div class="s-grid">
 
-<!-- ======================================================== -->
-
-<div class="s-cell-12" style="background-color:#f0f0ff">
-    <!-- ? -->
-    <table class="s-listing" id="dynamicListing" data-source="javascript:getListingDatasource()" data-oncreated="createColumns()">
-    </table>
-</div>
-
-<script>
-    function createColumns() {
-        var columns = [
-            {title: "Date", name: "date"},
-            {title: "Salesman", name: "salesman"},
-            {title: "Item", name: "item"},
-            {title: "Quantity", name: "quantity"},
-            {title: "Unity Cost", name: "unityCost"},
-            {title: "Total", name: "total", align: "center"}
-        ];
-        document.getElementById("dynamicListing").component.setColumns(columns);
-    }
-</script>
-
-<!-- ======================================================== -->
-
                 <div class="s-cell-12" style="background-color:#f0f0ff">
                     <!-- Normal -->
-<button type="button" onclick="Scaliby.getComponent('idListing').setRowsPerPage(5)">!</button>
+                    <button class="s-button" onclick="Scaliby.getComponent('idListing').setRowsPerPage(5)">Five Rows per Page</button>
                     <table class="s-listing" id="idListing" data-type="mult" data-source="javascript:getListingDatasource()"
                         data-filter="javascript:alert('filter')">
                         <thead>
@@ -682,6 +658,41 @@
                             <th data-name="quantity">Quantity</th>
                             <th data-name="unityCost">Unity Cost</th>
                             <th data-name="total" data-align="center">Total</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+
+                <div class="s-cell-12" style="background-color:#f0f0ff">
+                    <!-- Dynamic columns -->
+                    <table class="s-listing" id="dynamicListing" data-source="javascript:getListingDatasource3()" data-oncreated="createColumns()">
+                    </table>
+                </div>
+                <script>
+                    function createColumns() {
+                        var columns = [
+                            {title: "Name", name: "name"},
+                            {title: "Age", name: "age"},
+                        ];
+                        document.getElementById("dynamicListing").component.setColumns(columns);
+                    }
+                </script>
+
+                <div class="s-cell-12" style="background-color:#f0f0ff">
+                    <!-- Fixed column -->
+                    <table class="s-listing" id="fixedColumnListing" data-type="mult" data-source="javascript:getListingDatasource4()"
+                           data-filter="javascript:alert('filter')" data-scroll="horizontal-fixed-column">
+                        <thead>
+                        <tr>
+                            <th data-name="salesman">Salesman</th>
+                            <th data-name="date">Date</th>
+                            <th data-name="item">Item</th>
+                            <th data-name="quantity">Quantity</th>
+                            <th data-name="unityCost">Unity Cost</th>
+                            <th data-name="total" data-align="center">Total</th>
+                            <th data-name="code1">Code 1</th>
+                            <th data-name="code2">Code 2</th>
+                            <th data-name="code3">Code 3</th>
                         </tr>
                         </thead>
                     </table>
@@ -791,30 +802,6 @@
         ] };
     }
 
-/////////////////////
-/*
-$("#idListing").DataTable({
-    "columns": [
-        { "data": "date" },
-        { "data": "salesman" },
-        { "data": "item" },
-        { "data": "quantity" },
-        { "data": "unityCost" },
-        { "data": "total" }
-    ],
-
-    "ajax" : function (data, callback) {
-        callback({"data": getListingDatasource()})
-    },
-
-    scrollX:        true,
-    fixedColumns:   true
-
-    //scrollX: 100
-});
-*/
-//////////////////////
-
 function getListingDatasource2() {
         return { rows: [
             { col1: "1", col2: "2", col3: "3", col4: "4", col5: "5", col6: "6", col7:"7", col8:"8", col9:"9", col10:"10", col11:"11" , col12:"12" , col13:"13" , col14:"14" , col15:"15"},
@@ -829,6 +816,44 @@ function getListingDatasource2() {
             { col1: "901", col2: "902", col3: "903", col4: "904", col5: "905", col6: "906", col7:"907", col8:"908", col9:"909", col10:"9010", col11:"9011" , col12:"9012" , col13:"9013" , col14:"9014" , col15:"9015"},
         ] };
     }
+
+function getListingDatasource3() {
+    return { rows: [
+            { name:"Jardine", age:20},
+            { name:"Sorvino", age:50},
+            { name:"Andrews", age:23},
+            { name:"Thompson", age:18},
+            { name:"Morgan", age:45},
+            { name:"Parent", age:75},
+            { name:"Smith", age:31},
+            { name:"Paul", age:37},
+            { name:"John", age:25},
+            { name:"Mary", age:28},
+            { name:"Gill", age:42},
+            { name:"Jones", age:53},
+            { name:"Charles", age:62},
+            { name:"Howard", age:49},
+        ] };
+}
+
+function getListingDatasource4() {
+    return { rows: [
+            { date:"2018/01/06", salesman:"Jones", item:"Pencil", quantity:95, unityCost:1.99, total:189.05, code1:"KJHASDHASDKAFSDGMONURWE", code2:"56412765123509823469728764561245671525372398459203675871523472", code3:"UIWET98073425YETROY987235098234RIUWEY9872340958YWEIOUTY8743"},
+            { date:"2018/01/23", salesman:"Kivell", item:"Binder", quantity:50, unityCost:19.99, total:999.5, code1:"KJHFPOQWKRNNXHVCHSAÇOEW", code2:"98569083487641237654723457348596987328765417254123648789327487", code3:"IUWER98TU9803457IUWQ476T23764TYUW458763485YUIWER76QT2347Y23"},
+            { date:"2018/02/09", salesman:"Jardine", item:"Pencil", quantity:36, unityCost:4.99, total:179.64, code1:"DSAFNJLKSDFUYGASDJHASLJ", code2:"32452387469843250987562398458726752374576235467125347861253467", code3:"87OI12URQ89U0981234789WEUIYDI8UW38932745876WTUYWRO9W8RY8732"},
+            { date:"2018/02/26", salesman:"Gill", item:"Pen", quantity:27, unityCost:19.99, total:539.73, code1:"KHGÇKSDGFHAUERGISDFJHAS", code2:"23465123764516725476125412567451762354761254671253476512347651", code3:"23478YUWERUW349829858YQUEWR87QWY76234YUWTRE8TU983Y873Y43234"},
+            { date:"2018/03/15", salesman:"Sorvino", item:"Pencil", quantity:56, unityCost:2.99, total:167.44, code1:"CXMZÇLKDAIUHQOWUHSFHKJD", code2:"90870958973987389657823647651265341265435132451265436426374523", code3:"0945IRE98U897WY45HQEWR8YH87Q62487Q23YR8IU7R879Q23649781T32R"},
+            { date:"2018/04/18", salesman:"Andrews", item:"Pencil", quantity:75, unityCost:1.99, total:149.25, code1:"ASMXÇKVZHUYASGDIUYASHEW", code2:"45873489756187657612436123621536517460982347682367856675324234", code3:"9875UERIY87Q26346TWERY8W734YU97WYEUUAYFSDA65R23657QTYGQ76E2"},
+            { date:"2018/05/05", salesman:"Jardine", item:"Pencil", quantity:90, unityCost:4.99, total:449.1, code1:"ASKLCVNXCHNISDHBFUYGDSS", code2:"32498712387512764126541276538721646023987632868473567682352342", code3:"872Y34UHWIURYHQ76WT48Q2EYUWHYF87UCHZXUH8764YUGSUYASGTURYIGU"},
+            { date:"2018/05/22", salesman:"Thompson", item:"Pencil", quantity:32, unityCost:1.99, total:63.68, code1:"POITRYIURWEIOPREJFGDKLJ", code2:"76534768235847963247829759834798567872367842673547635467230894", code3:"FDSGJHSIDFHG87435683246WEFHSUDYHFI76WSA587QRYGAHSDFHGAUYWT6"},
+            { date:"2018/06/08", salesman:"Jones", item:"Binder", quantity:60, unityCost:8.99, total:539.4, code1:"VCXBFSDKCXJOIJSADFIUYWS", code2:"46834950893847587124687234672165612432156421786521873628176217", code3:"FHIUSAH87Q2634Q26378YWEYRA7WQTER768Q2T34YTGAWERFUYHWR87W34Y"},
+            { date:"2018/06/25", salesman:"Morgan", item:"Pencil", quantity:90, unityCost:4.99, total:449.1, code1:"XCVXZBHJKSBADJHGEUYGDSA", code2:"87568347687571624523765127653234632879834579834759873426672434", code3:"IUHASUTA7612R3TQAFGRW65Q21R36QGAW6E5T6253RWQAE652R36547RQ63"},
+            { date:"2018/07/12", salesman:"Howard", item:"Binder", quantity:29, unityCost:1.99, total:57.71, code1:"WQEYTSADGSVXZCGHSDUYGWQ", code2:"89374587436875127643512639634873259083475983457908435787532457", code3:"9834598UYTRQW67T436TERHW8437568WHREUYAGTW27534R67EWR8734Y57"},
+            { date:"2018/07/29", salesman:"Parent", item:"Binder", quantity:81, unityCost:19.99, total:1619.19, code1:"IORTYIUHJDGASDHGFATYUEW", code2:"36457623547682354672354987652387462387965423498723423987324765", code3:"KJNDFGKJHSIUHFIUHD36456325723AUHUIFHSDUGHSDUY87346572346879"},
+            { date:"2018/08/15", salesman:"Jones", item:"Pencil", quantity:35, unityCost:4.99, total:174.65, code1:"QWETFYSADBGSDFHKLJDSFIU", code2:"87632476321048923908723987423764785147534867234908723983247687", code3:"65142365RWUYGWEUOIEUWY6845768UFGJKLHJMFGKLJHOP6TI7098984567"},
+            { date:"2018/09/01", salesman:"Smith", item:"Desk", quantity:2, unityCost:125, total:250, code1:"REWIUHSAGSAUYDGIUYWQEU2", code2:"32874698437598347662187512765236752761587236432743987453897632", code3:"27635267TYEWURY3764578YERWUITYERUIT985769UTIHJFGKIU9568709U"},
+        ] };
+}
 
 </script>
 

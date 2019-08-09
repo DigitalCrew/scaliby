@@ -50,10 +50,10 @@ class Comm {
         }
 
         //System of lock and unlock elements
-        let lockedElementList = Comm._lockElements(lockedList);
+        let lockedElementList = LoadingSpinner.createAndlockElements(lockedList);
 
         function removeLoadingElements() {
-            Comm._unlockElements(lockedElementList);
+            LoadingSpinner.unlockElements(lockedElementList);
         }
 
         //Make the request and treat the answer
@@ -121,174 +121,6 @@ class Comm {
                 }
             }
         );
-    }
-
-    /**
-     * Locks the elements and builds a list of locked elements.
-     *
-     * @param elems The elements to be locked
-     *
-     * @return {Array} list of locked elements, or null if nothing locked.
-     *         <br>
-     *         The structure of each list item:
-     *         <ul>
-     *            <li>elem - The locked element. If empty, don't lock. If null, locks the body (Object);</li>
-     *            <li>spinner - the spinner element (Object);</li>
-     *            <li>tabIndexList - List with elements with disabled focus. See Comm._disableFocus() (Object).</li>
-     *          </ul>
-     *
-     * @private
-     */
-    static _lockElements(elems) {
-        if (document.activeElement) {
-            document.activeElement.blur();
-        }
-
-        if (!elems) {
-            return null;
-        }
-
-        let list = [];
-        for (let i = 0; i < elems.length; i++) {
-            let locked = {};
-
-            if (typeof elems[i] === "string") {
-                locked.elem = document.getElementById(elems[i]);
-            } else {
-                locked.elem = elems[i];
-            }
-
-            locked.elem.classList.add("spinner-overlay");
-
-            locked.spinner = Comm._createSpinner(locked.elem);
-            locked.tabIndexList = Comm._disableFocus(locked.elem);
-            list[list.length] = locked;
-        }
-
-        return list;
-    }
-
-    /**
-     * Creates a spinner.
-     *
-     * @param elem The element that receives the spinner
-     *
-     * @return {Object} the spinner.
-     *
-     * @private
-     */
-    static _createSpinner(elem) {
-        let size, deduction;
-        if (elem.offsetHeight > 64 && elem.offsetWidth > 64) {
-            size = 3;
-            deduction = 32;
-        } else if (elem.offsetHeight > 32 && elem.offsetWidth > 32) {
-            size = 2;
-            deduction = 16;
-        } else {
-            size = 1;
-            deduction = 8;
-        }
-
-        let spinner = Scaliby.createLoadingSpinner(size);
-        Base.configElement(spinner, {
-            styles: [
-                "position", "absolute",
-                "left", (elem.offsetLeft + (elem.offsetWidth / 2) - deduction) + "px",
-                "top", (elem.offsetTop + (elem.offsetHeight / 2) - deduction) + "px",
-                "z-index", 2000001
-            ],
-            parent: elem.parentNode
-        });
-
-        spinner.funcInterval = setInterval(function() {
-            Base.configElement(spinner, {
-                styles: [
-                    "left", (elem.offsetLeft + (elem.offsetWidth / 2) - deduction) + "px",
-                    "top", (elem.offsetTop + (elem.offsetHeight / 2) - deduction) + "px"
-                ]
-            });
-        }, 200);
-
-        return spinner;
-    }
-
-    /**
-     * Disables the focus of elements and builds a list of disabled focus elements.
-     * <br>
-     * The structure of each list item:
-     * <ul>
-     *   <li>elem: Element with disabled focus (Object);</li>
-     *   <li>tabIndex: The original value (int).</li>
-     * </ul>
-     *
-     * @param elem Element with another elements
-     *
-     * @return {Array} a list of disabled focus elements.
-     *
-     * @private
-     */
-    static _disableFocus(elem) {
-        let list = [];
-        let elems = elem.getElementsByTagName("*");
-
-        if (elem.tabIndex > -1) {
-            list[0] = { elem: elem, tabIndex: elem.tabIndex };
-            elem.tabIndex = -1;
-        }
-
-        for (let i = 0; i < elems.length; i++) {
-            if (elems[i].tabIndex > -1) {
-                list[list.length] = { elem: elems[i], tabIndex: elems[i].tabIndex };
-                elems[i].tabIndex = -1;
-            }
-        }
-
-        return list;
-    }
-
-    /**
-     * Unlocks the elements.
-     *
-     * @param elems List o structure of locked elements. See Comm._lockElements()
-     *
-     * @private
-     */
-    static _unlockElements = function(elems) {
-        if (!elems) {
-            return;
-        }
-
-        for (let i = 0; i < elems.length; i++) {
-            try {
-                elems[i].elem.classList.remove("spinner-overlay");
-            } catch (error) {
-            }
-
-            try {
-                clearInterval(elems[i].spinner.funcInterval);
-                elems[i].spinner.parentNode.removeChild(elems[i].spinner);
-            } catch (error) {
-            }
-
-            try {
-                Comm._enableFocus(elems[i].tabIndexList);
-            } catch (error) {
-            }
-        }
-    };
-
-    /**
-     * Enables the focus of elements.
-     *
-     * @param elems List o structure of locked elements. See Comm._disableFocus()
-     *
-     * @private
-     */
-    static _enableFocus(elems) {
-        for (let i = 0; i < elems.length; i++) {
-            elems[i].elem.tabIndex = elems[i].tabIndex;
-        }
     }
 
     /**
@@ -396,7 +228,7 @@ class Comm {
      * @param {string} path Request path
      */
     static request(path) {
-        Comm._lockElements(null);
+        LoadingSpinner.createAndlockElements(null);
         window.location.href = path;
     }
 

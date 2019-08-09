@@ -386,7 +386,7 @@ class Searchselect {
         });
 
         //Create the loading spinner
-        this._divSpinner = Scaliby.createLoadingSpinner(1);
+        this._divSpinner = LoadingSpinner.create(1);
         Base.configElement(this._divSpinner, {
             classes: ["mdc-text-field__icon"],
             styles: ["display", "none", "top", "16px"],

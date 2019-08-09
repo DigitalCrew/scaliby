@@ -118,8 +118,16 @@ class Listing {
             let amount = 60;
             let scroller = this._elem.parentNode;
 
+            let elem = this._elem;
             $(this._elem).bind("DOMMouseScroll mousewheel", function (event) {
                 let oEvent = event.originalEvent;
+
+                if (elem.dataset.scroll === "horizontal-fixed-column" && oEvent.target.tagName === "TD" &&
+                    Base.getIndexOfElement(oEvent.target) === 0) {
+                    //If the listing has a fixed column, horizontal scrolling should not be applied to the first column
+                    return;
+                }
+
                 let direction = oEvent.detail ? oEvent.detail * -amount : oEvent.wheelDelta;
                 let position = $(scroller).scrollLeft();
 
@@ -133,8 +141,8 @@ class Listing {
     /**
      * Applies the format in the cell.
      *
-     * @param {object} td TD of cell
-     * @param {object} th TH of cell
+     * @param {Object} td TD of cell
+     * @param {Object} th TH of cell
      *
      * @private
      */
@@ -153,7 +161,9 @@ class Listing {
     /**
      * Selects the row of listing component.
      *
-     * @param event The click event object
+     * @param {Object} event The click event object
+     * @param {Object} row   The row
+     *
      *
      * @private
      */
@@ -249,11 +259,10 @@ class Listing {
             let zeros = "0000";
             let orderList = [];
             for (let i = 0; i < thList.length; i++) {
-                let ordering = $(thList[i]).attr("data-order");
+                let ordering = thList[i].dataset.order;
                 if (ordering === undefined) {
                     continue;
                 }
-
                 let info = ordering.split("-");
                 if (info.length === 1) {
                     orderList[orderList.length] = zeros + "_" + i + "," + info[0];
@@ -267,9 +276,6 @@ class Listing {
             for (let i = 0; i < orderList.length; i++) {
                 let values = orderList[i].substring(5).split(",");
                 order[order.length] = [parseInt(values[0]), values[1]];
-            }
-            if (order.length === 0) {
-                order = [[0, "asc"]];
             }
         }
 
@@ -410,15 +416,23 @@ class Listing {
      * @private
      */
     _getDataSource(source, callback) {
+        let listing = this;
+
         if (source && source.startsWith("javascript:")) {
             //From Javascript code
-            callback({ "data": eval(this._processDataSource(eval(source.substring(11)))) });
+            let lockedElems = LoadingSpinner.createAndlockElements([this.getContainer()]);
+            function execCallback(source, lockedElements) {
+                let data = listing._processDataSource(eval(source.substring(11)));
+                LoadingSpinner.unlockElements(lockedElems);
+                return data;
+            }
+
+            callback({ "data": execCallback(source, lockedElems) });
         } else {
             //From URL
-            let listing = this;
             Comm.send({
                 path: source,
-                lockedList: [],
+                lockedList: [this.getContainer()],
                 callback: function(jsonData) { callback({ "data": listing._processDataSource(jsonData) }) },
                 dataType: "json",
                 type: "GET"
