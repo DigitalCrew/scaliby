@@ -557,7 +557,7 @@ body {
 }
 .tip-text{
     white-space: normal;
-    background: rgb(217, 215, 157);
+    background: rgb(255, 255, 210);
     border-radius: 10px;
     bottom: 26px;
     color: #4e4e4e;
@@ -565,11 +565,11 @@ body {
     font-size: 0.90em;
     overflow: hidden;
     cursor: pointer;
-    box-shadow: 0 0 10px 0 rgba(10, 10, 10, 0.6);
+    box-shadow: 2px 2px 3px 0px rgba(10, 10, 10, 0.6);
 }
 .tip-arrow {
     border: solid;
-    border-color: rgb(230, 228, 166) transparent;
+    border-color: rgb(255, 255, 210) transparent;
     border-width: 0 12px 12px 12px;
     width: 1px;
     bottom: 20px;
