@@ -1022,11 +1022,12 @@ Scaliby.createComponents(div.id);
     document.getElementById("tab_list").appendChild(document.getElementById("div_list"));
     document.getElementById("tab_others").appendChild(document.getElementById("div_others"));
 
-    //Create the components 10 times to verify for possible faults
-    for (let i = 0; i < 10; i++) {
-        Scaliby.createComponents();
-    }
-
+    Scaliby.init(function() {
+        //Create the components 10 times to verify for possible faults
+        for (let i = 0; i < 10; i++) {
+            Scaliby.createComponents();
+        }
+    });
 </script>
 
 </body>

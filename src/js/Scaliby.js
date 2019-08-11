@@ -87,22 +87,6 @@ class Scaliby {
             data.i18n.numberGroupSeparator);
         Scaliby._debug = data.debug;
         Scaliby._messages = data.messages;
-    }
-
-
-    /**
-     * Initializes the Scaliby.
-     */
-    static init() {
-        //Load configuration of Scaliby. The root path is "/js"
-        $.ajax({
-            type: "get",
-            url: "./js/scaliby.json",
-            dataType: 'json',
-            success: function (data) {
-                Scaliby._setConfiguration(data);
-            }
-        });
 
         //Event to adjust the drawer
         Scaliby._desktopScreen.onchange = function (changed) {
@@ -129,14 +113,31 @@ class Scaliby {
             };
         }
 
+        //Configure the Dialog component
+        let messages = Scaliby.getConfiguration().messages;
+        Dialog.configure("OK", messages.button.accept, messages.button.cancel);
+
         //Steps after page loaded
         window.addEventListener("load", function() {
             //Set the Drawer
             Scaliby.adjustDrawer();
+        });
+    }
 
-            //Configure the Dialog component
-            let messages = Scaliby.getConfiguration().messages;
-            Dialog.configure("OK", messages.button.accept, messages.button.cancel);
+
+    /**
+     * Initializes the Scaliby.
+     */
+    static init(callback) {
+        //Load configuration of Scaliby. The root path is "/js"
+        $.ajax({
+            type: "get",
+            url: "./js/scaliby.json",
+            dataType: 'json',
+            success: function (data) {
+                Scaliby._setConfiguration(data);
+                callback();
+            },
         });
     }
 
@@ -546,6 +547,12 @@ class Scaliby {
 
     /**
      * Create the icon element.
+     * <br>
+     * Source of icons:
+     * <ul>
+     *   <li><b>Icon name: </b> Material icons {@link https://material.io/resources/icons};</li>
+     *   <li><b>"x1-" prefix + icon name:</b> Material Design Icons {@link http://materialdesignicons.com}.</li>
+     * </ul>
      *
      * @param {string} name Name of icon
      *
@@ -618,6 +625,3 @@ class Scaliby {
     }
 
 }
-
-
-Scaliby.init();
