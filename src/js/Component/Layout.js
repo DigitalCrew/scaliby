@@ -68,7 +68,6 @@ class Layout {
         let appContent = Base.createElement({
             tag: "div",
             classes: ["mdc-drawer-app-content"],
-            styles: ["height", "100%"],
             parent: elem,
             insertAt: 1 //After "aside"
         });
@@ -203,7 +202,6 @@ class Layout {
         let elem = this._elem;
         setTimeout(function () {
             if (elem.footer) {
-                elem.style.minHeight = "calc(100% - " + elem.footer.offsetHeight + "px)";
                 elem.style.opacity = "1";
                 elem.footer.style.opacity = "1";
                 elem.component._sidebar.style.opacity = "1";
