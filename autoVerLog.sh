@@ -134,6 +134,6 @@ echo "New generated version: ${VERSION}"
 
 # Commits changes
 git add .
-git commit -m "New version."
+git commit -m "chg: New version."
 git push -u origin master
 
