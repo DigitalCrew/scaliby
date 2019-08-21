@@ -575,6 +575,12 @@
             <button onclick="document.getElementById('idList').component.setSelected(['one', 'three'])">Do Selection</button>
             <button onclick="newList()">New Options</button>
 
+<button class="s-button" id="idMenuButton1" onclick="document.getElementById('idMenu1').component.open();">Open Menu</button>
+<ul id="idMenu1" class="s-menu" data-over="idMenuButton1">
+    <li onclick="clickOnMenu(1)">Item One</li>
+    <li onclick="clickOnMenu(2)">Item Two</li>
+</ul>
+
             <ul id="idList" class="s-list" data-selection-type="single" data-left-icon-class="" data-left-img-class="list-image"
                 data-right-icon-class="" data-right-img-class="list-image">
                 <li value="one" onclick="clickOnList(event)">Item One</li>
