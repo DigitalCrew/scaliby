@@ -48,8 +48,11 @@
 # Array with commits without TAG #
 ##################################
 
+# Fetching all tags from a remote
+git fetch --tags
+
 # Creates a file with all commits that don't have TAGs
-git log --pretty="%H %d" --decorate | grep -i -v -E "^.*\(tag:" | cut -f 1 -d ' ' > temp.txt
+git log --pretty="%H %d" --decorate | grep -i -v -E "^.*\(.*tag:" | cut -f 1 -d ' ' > temp.txt
 
 # Transforms the commit file into an array
 IFS=$'\n' read -d '' -r -a COMMITS < temp.txt
@@ -85,12 +88,14 @@ do
 done
 
 VERSION+=$((${VERSION_PARTS[SIZE - 1]} + 1))
-echo ${VERSION} > VERSION.txt
+echo -n ${VERSION} > VERSION.txt
 
-# Creates the tag of new version for the commits
+# Creates the tags of new version for the commits
+COUNT=1
 for i in "${COMMITS[@]}"
 do
-    git tag -a -m "New version." ${VERSION} ${i}
+    git tag -a -m "Version." ${VERSION}_${COUNT} ${i}
+    COUNT=$(($COUNT + 1))
 done
 
 ################################################
@@ -105,7 +110,7 @@ declare -a TYPES_NAMES=("New Features" "Changed Features" "Bug Fixes")
 for (( i = 0; i < ${#TYPES[@]}; i++ ))
 do
     echo "### ${TYPES_NAMES[i]}" >> temp.txt
-    git log --pretty="*%s [%an] [%ai]" | grep -i "^*${TYPES[i]}" | sed "s/${TYPES[i]}//" >> temp.txt
+    git log --pretty="* %s [%an] [%ai]" | grep -i "^* ${TYPES[i]}" | sed "s/${TYPES[i]}//" >> temp.txt
     echo "" >> temp.txt
 done
 
@@ -118,7 +123,7 @@ done
 NO_TYPE+=")"
 
 echo "### No Type" >> temp.txt
-git log --pretty="*%s [%an] [%ai]" | grep -ivE "${NO_TYPE}" >> temp.txt
+git log --pretty="* %s [%an] [%ai]" | grep -ivE "${NO_TYPE}" >> temp.txt
 echo "" >> temp.txt
 
 # Adds the new messages at the beginning of the CHANGELOG.md file
@@ -135,5 +140,8 @@ echo "New generated version: ${VERSION}"
 # Commits changes
 git add .
 git commit -m "chg: New version."
+git tag -a -m "Version." ${VERSION}_${COUNT}
 git push -u origin master
 
+# Push tags to a server
+git push origin --tags
