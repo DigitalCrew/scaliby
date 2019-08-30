@@ -29,6 +29,7 @@ class Dialog {
     /** OK button. */
     static _buttonOk;
 
+    /** Element to show in dialog. */
     static _sourceElement = null;
 
 
@@ -158,7 +159,13 @@ class Dialog {
         this._mdcDialog.listen('MDCDialog:closing', function() {
             let contentElement = document.getElementById("system_dialog_content");
             if (Dialog._sourceElement !== null) {
-                contentElement.removeChild(Dialog._sourceElement);
+                let source = Dialog._sourceElement;
+                source.classList.add("hide-element");
+                contentElement.removeChild(source);
+
+                if (source.dialogParent !== null) {
+                    Base.insertElementAt(source, source.dialogParent, source.dialogPositionAtParent);
+                }
             }
             contentElement.innerHTML = "";
         });
@@ -180,7 +187,15 @@ class Dialog {
             document.getElementById("system_dialog_content").innerHTML = source;
             this._sourceElement = null;
         } else {
-            $("#system_dialog_content").html(source);
+            source.classList.remove("hide-element");
+
+            source.dialogParent = source.parentNode;
+            if (source.dialogParent !== null) {
+                source.dialogPositionAtParent = Base.getIndexOfElement(source);
+                source.parentNode.removeChild(source);
+            }
+
+            document.getElementById("system_dialog_content").appendChild(source);
             this._sourceElement = source;
         }
     }
