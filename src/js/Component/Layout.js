@@ -109,17 +109,29 @@ class Layout {
             header.appendChild(divRow);
 
             //Menu button
-            let button = Base.createElement({
-                tag: "a",
-                classes: ["material-icons", "mdc-icon-button"],
-                attrs: ["href", "#"],
-                content: "menu",
-                parent: divSection,
-                insertAt: 0
-            });
-            button.addEventListener("click", function () {
-                elem.component._mdc.open = !elem.component._mdc.open;
-            });
+            if (elem.dataset.type === "none") {
+                let button = Base.createElement({
+                    tag: "span",
+                    classes: ["material-icons", "mdc-icon-button"],
+                    styles: ["width", "1px", "padding", "0"],
+                    attrs: ["href", "#"],
+                    content: "",
+                    parent: divSection,
+                    insertAt: 0
+                });
+            } else {
+                let button = Base.createElement({
+                    tag: "a",
+                    classes: ["material-icons", "mdc-icon-button"],
+                    attrs: ["href", "#"],
+                    content: "menu",
+                    parent: divSection,
+                    insertAt: 0
+                });
+                button.addEventListener("click", function () {
+                    elem.component._mdc.open = !elem.component._mdc.open;
+                });
+            }
         }
 
         //Content
