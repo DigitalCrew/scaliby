@@ -235,6 +235,9 @@ class Layer {
             if (elemWithLayers.dataset.layers !== "true") {
                 //Element doesn't use layers. Consider a child. Searches a parent with layers
                 while ((elemWithLayers = elemWithLayers.parentNode)) {
+                    if (!elemWithLayers || !elemWithLayers.dataset) {
+                        return null;
+                    }
                     if (elemWithLayers.dataset.layers === "true") {
                         break;
                     }

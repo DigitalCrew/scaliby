@@ -302,11 +302,18 @@ class Comm {
         Form.removeAllErrors(form);
 
         //Send the form via Ajax
+        if (!id) {
+            let layer = Layer.getElementWithLayers(form);
+            if (layer) {
+                id = Layer.getElementWithLayers(form).id;
+            }
+        }
+
         Comm._sendAsync({
             path: path,
             fields: ["_form", formId],
             form: form,
-            id: id ? id : Layer.getElementWithLayers(form).id,
+            id: id,
             lockedList: [formId],
             type: "POST"
         });

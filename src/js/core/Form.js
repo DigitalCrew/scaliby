@@ -699,7 +699,10 @@ class Form {
      * @param form Element of form
      */
     static removeAllErrors(form) {
-        form.querySelector(".panel-error").classList.add("hide-element");
+        let errorPanel = form.querySelector(".panel-error");
+        if (errorPanel !== null) {
+            errorPanel.classList.add("hide-element");
+        }
 
         let elems = Form.getFields(form);
         for (let i = 0; i < elems.length; i++) {
