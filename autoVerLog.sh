@@ -44,6 +44,35 @@
 ####################################################################################################
 
 
+#######################################################
+# Function to transform commits to messages.          #
+# 1o parameter = the current version(tag)             #
+# 2o parameter = file name with commits               #
+# 3o parameter = file name that receives the messages #
+#######################################################
+commits_to_messages () {
+  # Transforms the commit file into an array
+  local COMMITS=""
+  IFS=$'\n' read -d '' -r -a COMMITS < $2
+
+  local delimiter=" (tag: "
+  local i=0
+  for i in "${COMMITS[@]}"
+  do
+    # For each commit, gets the message and version(tag)
+    message="${i%$delimiter*}"
+    substring_with_tag="${i#*$delimiter}"
+    tag=${substring_with_tag:0:${#substring_with_tag}-1}
+
+    if  [[ $tag == "$1"* ]] ;
+    then
+      # If message is from the current version, put it in the messages file
+      echo "${message}" >> $3
+    fi
+  done
+}
+
+
 ##################################
 # Array with commits without TAG #
 ##################################
@@ -62,8 +91,8 @@ rm temp.txt
 
 # If empty array, there isn't a new version
 if [[ ${#COMMITS[@]} -eq 0 ]]; then
-    echo "There isn't a new version."
-    exit
+  echo "There isn't a new version."
+  exit
 fi
 
 #####################################
@@ -71,8 +100,8 @@ fi
 #####################################
 
 if [[ ! -f VERSION.txt ]]; then
-    echo "The VERSION.txt file doesn't exist."
-    exit
+  echo "The VERSION.txt file doesn't exist."
+  exit
 fi
 
 # Get the current version of project
@@ -84,7 +113,7 @@ SIZE=${#VERSION_PARTS[@]}
 
 for (( i = 0; i < ${#VERSION_PARTS[@]} - 1; i++ ))
 do
-    VERSION+="${VERSION_PARTS[i]}."
+  VERSION+="${VERSION_PARTS[i]}."
 done
 
 VERSION+=$((${VERSION_PARTS[SIZE - 1]} + 1))
@@ -94,27 +123,36 @@ echo -n ${VERSION} > VERSION.txt
 COUNT=1
 for i in "${COMMITS[@]}"
 do
-    git tag -a -m "Version." ${VERSION}_${COUNT} ${i}
-    COUNT=$(($COUNT + 1))
+  git tag -a -m "Version." ${VERSION}_${COUNT} ${i}
+  COUNT=$(($COUNT + 1))
 done
 
 ################################################
 # Generates change information for new version #
 ################################################
 
-# Get messages of commits grouped by type
+# Builds an array of commit types
 echo "# ${VERSION} (`date +%Y-%m-%d`)" > temp.txt
 echo "" >> temp.txt
 declare -a TYPES=("new: " "chg: " "fix: ")
 declare -a TYPES_NAMES=("New Features" "Changed Features" "Bug Fixes")
+
+# Builds the messages of each type group
 for (( i = 0; i < ${#TYPES[@]}; i++ ))
 do
-    echo "### ${TYPES_NAMES[i]}" >> temp.txt
-    git log --pretty="* %s [%an] [%ai]" | grep -i "^* ${TYPES[i]}" | sed "s/${TYPES[i]}//" >> temp.txt
-    echo "" >> temp.txt
+  # Type group title
+  echo "### ${TYPES_NAMES[i]}" >> temp.txt
+
+  # Get the commits from the current type group
+  git log --pretty="* %s [%an] [%ai] %d" | grep -i "^* ${TYPES[i]}" | sed "s/${TYPES[i]}//" >> temp2.txt
+
+  # Transforms the commits from the new version in messages
+  commits_to_messages ${VERSION} temp2.txt temp.txt
+  echo "" >> temp.txt
+  rm temp2.txt
 done
 
-# Get messages of commits without types
+# Builds the regular expression about commits without types
 NO_TYPE="^*(${TYPES[0]}"
 for (( i = 1; i < ${#TYPES[@]}; i++ ))
 do
@@ -122,9 +160,17 @@ do
 done
 NO_TYPE+=")"
 
+# Type group title
 echo "### No Type" >> temp.txt
-git log --pretty="* %s [%an] [%ai]" | grep -ivE "${NO_TYPE}" >> temp.txt
+
+# Get the commits from the without types
+git log --pretty="* %s [%an] [%ai] %d" | grep -ivE "${NO_TYPE}" >> temp2.txt
+
+# Transforms the commits from the new version in messages
+commits_to_messages ${VERSION} temp2.txt temp.txt
 echo "" >> temp.txt
+rm temp2.txt
+exit
 
 # Adds the new messages at the beginning of the CHANGELOG.md file
 if [[ ! -f CHANGELOG.md ]]; then
@@ -134,7 +180,6 @@ fi
 cat CHANGELOG.md > temp2.txt
 cat temp.txt temp2.txt > CHANGELOG.md
 rm temp.txt
-rm temp2.txt
 echo "New generated version: ${VERSION}"
 
 # Commits changes
