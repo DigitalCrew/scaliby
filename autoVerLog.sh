@@ -170,7 +170,6 @@ git log --pretty="* %s [%an] [%ai] %d" | grep -ivE "${NO_TYPE}" >> temp2.txt
 commits_to_messages ${VERSION} temp2.txt temp.txt
 echo "" >> temp.txt
 rm temp2.txt
-exit
 
 # Adds the new messages at the beginning of the CHANGELOG.md file
 if [[ ! -f CHANGELOG.md ]]; then
@@ -182,7 +181,7 @@ cat temp.txt temp2.txt > CHANGELOG.md
 rm temp.txt
 echo "New generated version: ${VERSION}"
 
-# Commits changes
+# Commits changes to CHANGELOG.md and VERSION with tag , but these commits don't go to CHANGELOG.md
 git add .
 git commit -m "chg: New version."
 git tag -a -m "Version." ${VERSION}_${COUNT}
