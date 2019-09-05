@@ -55,16 +55,17 @@ commits_to_messages () {
   local COMMITS=""
   IFS=$'\n' read -d '' -r -a COMMITS < $2
 
-  local delimiter=" (tag: "
+  local delimiter1=" @#@ "
+  local delimiter2="tag: "
   local i=0
   for i in "${COMMITS[@]}"
   do
     # For each commit, gets the message and version(tag)
-    message="${i%$delimiter*}"
-    substring_with_tag="${i#*$delimiter}"
-    tag=${substring_with_tag:0:${#substring_with_tag}-1}
+    message="${i%$delimiter1*}"
+    substring_with_tag="${i#*$delimiter1}"
+    text_starts_with_tag="${substring_with_tag#*$delimiter2}"
 
-    if  [[ $tag == "$1"* ]] ;
+    if  [[ $text_starts_with_tag == "$1"* ]] ;
     then
       # If message is from the current version, put it in the messages file
       echo "${message}" >> $3
@@ -77,6 +78,9 @@ commits_to_messages () {
 # Array with commits without TAG #
 ##################################
 
+rm -f temp.txt
+rm -f temp2.txt
+
 # Fetching all tags from a remote
 git fetch --tags
 
@@ -87,7 +91,7 @@ git log --pretty="%H %d" --decorate | grep -i -v -E "^.*\(.*tag:" | cut -f 1 -d 
 IFS=$'\n' read -d '' -r -a COMMITS < temp.txt
 
 # Deletes the temporary file
-rm temp.txt
+rm -f temp.txt
 
 # If empty array, there isn't a new version
 if [[ ${#COMMITS[@]} -eq 0 ]]; then
@@ -144,12 +148,12 @@ do
   echo "### ${TYPES_NAMES[i]}" >> temp.txt
 
   # Get the commits from the current type group
-  git log --pretty="* %s [%an] [%ai] %d" | grep -i "^* ${TYPES[i]}" | sed "s/${TYPES[i]}//" >> temp2.txt
+  git log --pretty="* %s [%an] [%ai] @#@ %d" | grep -i "^* ${TYPES[i]}" | sed "s/${TYPES[i]}//" >> temp2.txt
 
   # Transforms the commits from the new version in messages
   commits_to_messages ${VERSION} temp2.txt temp.txt
   echo "" >> temp.txt
-  rm temp2.txt
+  rm -f temp2.txt
 done
 
 # Builds the regular expression about commits without types
@@ -164,12 +168,12 @@ NO_TYPE+=")"
 echo "### No Type" >> temp.txt
 
 # Get the commits from the without types
-git log --pretty="* %s [%an] [%ai] %d" | grep -ivE "${NO_TYPE}" >> temp2.txt
+git log --pretty="* %s [%an] [%ai] @#@ %d" | grep -ivE "${NO_TYPE}" >> temp2.txt
 
 # Transforms the commits from the new version in messages
 commits_to_messages ${VERSION} temp2.txt temp.txt
 echo "" >> temp.txt
-rm temp2.txt
+rm -f temp2.txt
 
 # Adds the new messages at the beginning of the CHANGELOG.md file
 if [[ ! -f CHANGELOG.md ]]; then
@@ -178,7 +182,8 @@ fi
 
 cat CHANGELOG.md > temp2.txt
 cat temp.txt temp2.txt > CHANGELOG.md
-rm temp.txt
+rm -f temp.txt
+rm -f temp2.txt
 echo "New generated version: ${VERSION}"
 
 # Commits changes to CHANGELOG.md and VERSION with tag , but these commits don't go to CHANGELOG.md
