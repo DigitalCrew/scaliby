@@ -151,6 +151,10 @@ class Select {
             return;
         }
 
+        while (elem.options.length > 0) {
+            elem.remove(0);
+        }
+
         let option;
         if (empty) {
             option = document.createElement("option");
