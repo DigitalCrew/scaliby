@@ -311,9 +311,28 @@ class Scaliby {
     }
 
     /**
-     * Creates the children components from a parent element.
+     * Updates the children components from a parent element.
      *
      * @param {string=} parentId Parent element ID. If null, applies update in all page
+     */
+    static updateComponents(parentId) {
+        let parent;
+        if ((parent = document.getElementById(parentId)) === null) {
+            parent = document.body;
+        }
+
+        let elems = parent.querySelectorAll("button, div, table, ul, input, textarea, select");
+        for (let i = 0; i < elems.length; i++) {
+            if (elems[i].component) {
+                elems[i].component.update();
+            }
+        }
+    }
+
+    /**
+     * Creates the children components from a parent element.
+     *
+     * @param {string=} parentId Parent element ID. If null, applies in all page
      */
     static createComponents(parentId) {
         let parent;
@@ -372,7 +391,9 @@ class Scaliby {
     static createComponent(elem) {
         try {
             if (elem.component) {
-                elem.component.update();
+                if (elem.component.update) {
+                    elem.component.update();
+                }
             } else {
                 switch (Scaliby.getComponentType(elem)) {
                     case Scaliby.COMPONENT_TYPE.TEXT_FIELD:

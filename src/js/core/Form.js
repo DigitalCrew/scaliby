@@ -580,7 +580,7 @@ class Form {
      * Shows the fields.
      *
      * @param {string} formId        ID of form
-     * @param {boolean} targetIsCell If true, show the cells that contains the fields. Default is false
+     * @param {boolean} targetIsCell If true, shows the cells that contains the fields. Default is false
      * @param {Array=} list          List of fields names. If omitted, get all fields of form
      */
     static showFields(formId, targetIsCell, list) {
@@ -613,7 +613,7 @@ class Form {
      * Hides the fields.
      *
      * @param {string} formId        ID of form
-     * @param {boolean} targetIsCell If true, show the cells that contains the fields. Default is false
+     * @param {boolean} targetIsCell If true, hides the cells that contains the fields. Default is false
      * @param {Array=} list          List of fields names. If omitted, get all fields of form
      */
     static hideFields(formId, targetIsCell, list) {
