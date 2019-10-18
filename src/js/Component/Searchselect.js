@@ -354,7 +354,7 @@ class Searchselect {
             id: elem.id + "_input",
             classes: ["mdc-text-field__input"],
             styles: ["padding", "18px 12px 2px"],
-            attrs: ["tab-index", elem.tabIndex, "autocomplete", "new-password"],
+            attrs: ["tab-index", elem.tabIndex, "autocomplete", "off"],
             parent: this._div
         });
         this._input.select = this._elem;
