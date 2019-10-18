@@ -323,7 +323,7 @@ class Scaliby {
 
         let elems = parent.querySelectorAll("button, div, table, ul, input, textarea, select");
         for (let i = 0; i < elems.length; i++) {
-            if (elems[i].component) {
+            if (elems[i].component && elems[i].component.update) {
                 elems[i].component.update();
             }
         }
