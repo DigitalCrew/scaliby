@@ -15,6 +15,26 @@
  */
 class Form {
     /**
+     * Converts a number or date value to string.
+     *
+     * @param {Object} value Value to be converted
+     *
+     * @return {string} text value.
+     *
+     * @private
+     */
+    static _valueToString(value) {
+        if (typeof value == "number") {
+            return I18n.numberToString(value);
+        } else if (value instanceof Date) {
+            return I18n.dateToString(value);
+        } else {
+            return value;
+        }
+    }
+
+
+    /**
      * Gets the form that contains the input component element.
      *
      * @param {Object} elem Input component element inside a form
@@ -477,7 +497,7 @@ class Form {
      * Fills form fields and shows the error messages.
      *
      * @param {string} formId   Form ID
-     * @param {string[]} values List with fields names and their respective values
+     * @param {Object[]} values List with fields names and their respective values
      * @param {string[]} errors List with fields names and their respective message errors
      */
     static fill(formId, values, errors) {
@@ -490,7 +510,7 @@ class Form {
                     console.error("[Form.fill] Field '" + values[i] + "' doesn't exist.");
                     continue;
                 }
-                Form.setValueByElement(elem, values[i + 1]);
+                Form.setValueByElement(elem, Form._valueToString(values[i + 1]));
             }
 
         }
