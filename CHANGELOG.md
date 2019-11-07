@@ -1,3 +1,22 @@
+# 1.0.3 (2019-11-06)
+
+### New Features
+
+### Changed Features
+* The values of fields in Form.fill method can be string, number and date. [Fernando Viegas] [2019-10-21 19:08:12 -0300]
+
+### Bug Fixes
+* Doesn't show autocomplete in Searchselect component. [Fernando Viegas] [2019-10-18 11:48:05 -0300]
+* When updates a component, verifies if the component has the "update" method. [Fernando Viegas] [2019-10-18 11:46:54 -0300]
+* When creates or updates a component, verifies if the component has the "update" method. [Fernando Viegas] [2019-10-17 11:39:17 -0300]
+* clears the options before adding new options to the select component. [Fernando Viegas] [2019-10-02 07:40:02 -0300]
+* Fixes to generate new version. [Fernando Viegas] [2019-09-05 15:11:22 -0300]
+* Fixes to generate new version. [Fernando Viegas] [2019-09-05 10:55:14 -0300]
+* Fixes to generate new version. [Fernando Viegas] [2019-09-05 10:06:01 -0300]
+* Text correction. [Fernando Viegas] [2019-09-02 15:35:52 -0300]
+
+### No Type
+
 # 1.0.2 (2019-09-02)
 
 ### New Features
