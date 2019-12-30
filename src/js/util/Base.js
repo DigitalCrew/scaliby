@@ -310,6 +310,10 @@ class Base {
                 elem = component.getContainer();
             }
 
+            if (elem.dataset.visible === undefined) {
+                elem.dataset.visible = "true";
+            }
+
             if (elem.dataset.visible === "false") {
                 component.getContainer().classList.add("hide-element");
             } else {
@@ -391,16 +395,6 @@ class Base {
     }
 
     /**
-     * Dispatches an event of element.
-     *
-     * @param {Object} elem The element
-     * @param {string} name The name of event
-     */
-    static dispatchEvent(elem, name) {
-        elem.dispatchEvent(new Event(name));
-    }
-
-    /**
      * Get the first element that matches the selector by testing the element itself and traversing up through its
      * ancestors.
      *
@@ -429,6 +423,36 @@ class Base {
             }
         }
         return null;
+    }
+
+    /**
+     * Verifies if the element is inside another element and its children.
+     *
+     * @param {Object} elem   Element to be searched
+     * @param {Object} target Target element that can have the element to search
+     *
+     * @return {boolean} true if target has element.
+     */
+    static hasElement(target, elem) {
+        if (!target) {
+            return false;
+        }
+        if (target === elem) {
+            return true;
+        } else if (!target.childNodes) {
+            return false;
+        }
+
+        for (let i = 0 ; i < target.childNodes.length; i++) {
+            if (target.childNodes[i] === elem) {
+                return true;
+            }
+            if (this.hasElement(target.childNodes[i], elem) === true) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -33,6 +33,9 @@ class Scaliby {
     /** The current focused element. */
     static _currentFocusedElement = null;
 
+    /** The current blurred element. */
+    static _currentBlurredElement = null;
+
     /** @Media that indicate if the screen is desktop. */
     static _desktopScreen = window.matchMedia("(min-width: 769px)");
 
@@ -93,10 +96,18 @@ class Scaliby {
             Scaliby.adjustDrawer(changed.matches);
         };
 
-        //Stores the last element focused
+        //Stores the last and current elements focused
         document.addEventListener('focus', function(event) {
-            Scaliby.setLastFocusedElement(Scaliby.getCurrentFocusedElement());
+            Scaliby.setLastFocusedElement(Scaliby._currentBlurredElement); //Scaliby.getCurrentFocusedElement()
             Scaliby.setCurrentFocusedElement(event.target);
+//console.log("FOCUS last: " + Scaliby.getLastFocusedElement().name);
+//console.log("FOCUS curr: ", event.target);
+        }, true);
+
+        document.addEventListener('blur', function(event) {
+            Scaliby.setCurrentFocusedElement(null);
+            Scaliby._currentBlurredElement = event.target;
+//console.log("BLUR curr: ", Scaliby._currentBlurredElement);
         }, true);
 
         //Support for IE11
@@ -139,6 +150,24 @@ class Scaliby {
                 callback();
             },
         });
+    }
+
+    /**
+     * Destroys all MDC components of the parent element and its children.
+     *
+     * @param {Object} parent Parent element
+     */
+    static destroyMdcComponents(parent) {
+        if (parent.component && parent.component.destroy) {
+            parent.component.destroy();
+        }
+
+        let elems = parent.querySelectorAll("button, div, table, ul, input, textarea, select");
+        for (let i = 0; i < elems.length; i++) {
+            if (elems[i].component && elems[i].component.destroy) {
+                elems[i].component.destroy();
+            }
+        }
     }
 
     /**
@@ -197,7 +226,7 @@ class Scaliby {
     /**
      * Gets the component of element.
      *
-     * @param {string} value ID or object of element that represents a component
+     * @param {string|Object} value ID or object of element that represents a component
      *
      * @return {Object} the component.
      */

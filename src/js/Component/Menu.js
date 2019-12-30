@@ -16,12 +16,75 @@ class Menu {
     /** Element of component. */
     _elem;
 
-    /** MDC framework. */
-    _mdc;
+    /* Main element. */
+    _main;
+
+    /* Anchor element. */
+    _anchor;
 
 
     /**
-     * Constructor.
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+
+        this._elem._mdc = new mdc.menu.MDCMenu(this._main);
+        this._elem._mdc.setDefaultFocusState(2);
+        this._elem.component = this;
+
+        this._main.elem = this._elem;
+        this._elem._mdc.listen("MDCMenu:selected", this._selectedEvent);
+    }
+
+    /**
+     * Component event listener of selected item.
+     * Observation: this = main element.
+     *
+     * @param {json} data
+     *
+     * @private
+     */
+    _selectedEvent(data) {
+        let component = this.elem.component;
+
+        if (component._elem._mdc !== null) {
+            let item = data.detail.item;
+            if (!item.classList.contains("mdc-list-item--disabled") && item.onselected) {
+                if (typeof item.onselected === "string") {
+                    eval(item.onselected);
+                } else {
+                    item.onselected();
+                }
+            }
+        }
+    }
+
+    /**
+     * Disable or enable an item.
+     * Observation: Workaround when item is disabled.
+     *
+     * @param {Object} li     Item element
+     * @param {boolean} state If true, disable the element, otherwise enable it
+     *
+     * @private
+     */
+    _disableItem(li, state) {
+        if (state === true) {
+            li.classList.remove("mdc-list-item");
+            li.classList.add("mdc-list-item--disabled");
+            li.classList.add("list-item-disabled");
+        } else {
+            li.classList.remove("mdc-list-item--disabled");
+            li.classList.remove("list-item-disabled");
+            li.classList.add("mdc-list-item");
+        }
+    }
+
+    /**
+     * Create the component.
      *
      * @param {object} elem Input element of component
      *
@@ -44,7 +107,7 @@ class Menu {
         }
 
         //Anchor
-        let divAnchor = Base.createElement({
+        this._anchor = Base.createElement({
             tag: "div",
             classes: ["mdc-menu-surface--anchor"],
             styles: ["display", "inline-block"],
@@ -53,24 +116,24 @@ class Menu {
         });
         if (elemOver) {
             Base.configElement(elemOver, {
-                parent: divAnchor,
+                parent: this._anchor,
                 insertAt: 0
             });
         }
 
         //Surface
-        let divSurface = Base.createElement({
+        this._main = Base.createElement({
             tag: "div",
             classes: ["mdc-menu", "mdc-menu-surface"],
             attrs: ["tabindex", "-1"],
-            parent: divAnchor
+            parent: this._anchor
         });
 
         //Configure the "ul" element
         Base.configElement(this._elem, {
             classes: ["mdc-list"],
             attrs: ["aria-orientation", "vertical", "aria-hidden", "true", "role", "menu"],
-            parent: divSurface
+            parent: this._main
         });
 
         //List of "li"
@@ -103,6 +166,9 @@ class Menu {
                     attrs: ["role", "menuitem"],
                     content: ""
                 });
+                if (items[i].dataset.disabled === "true") {
+                    this._disableItem(items[i], true);
+                }
 
                 //Left Image
                 if (items[i].dataset.leftImg) {
@@ -150,7 +216,7 @@ class Menu {
 
                 //Right icon
                 if (items[i].dataset.rightIcon) {
-                    var rightIconClass = ["material-icons"];
+                    let rightIconClass = ["material-icons"];
                     if (elem.dataset.leftIconClass) {
                         rightIconClass[rightIconClass.length] = this._elem.dataset.leftIconClass;
                     } else {
@@ -189,6 +255,11 @@ class Menu {
                         parent: items[i]
                     });
                 }
+
+                //Event when item is selected
+                if (items[i].dataset.onselected) {
+                    items[i].onselected = items[i].dataset.onselected;
+                }
             }
         }
 
@@ -202,22 +273,22 @@ class Menu {
      * @private
      */
     _removeAnchorAndSurface() {
-        let divAnchor = null, divSurface = null, elemOver = null;
+        let elemOver = null;
 
         if (this._elem.parentNode && this._elem.parentNode.classList.contains("mdc-menu-surface")) {
             //Element under surface and anchor
-            divSurface = this._elem.parentNode;
-            divAnchor = this._elem.parentNode.parentNode;
+            this._main = this._elem.parentNode;
+            this._anchor = this._elem.parentNode.parentNode;
 
-            if (!divAnchor.children[0].classList.contains("mdc-menu-surface")) {
+            if (!this._anchor.children[0].classList.contains("mdc-menu-surface")) {
                 //Element Within Wrapper
-                elemOver = divAnchor.children[0];
+                elemOver = this._anchor.children[0];
             }
 
             //Move out the element
             Base.configElement(this._elem, {
-                parent: divAnchor.parentNode,
-                insertAt: Base.getIndexOfElement(divAnchor)
+                parent: this._anchor.parentNode,
+                insertAt: Base.getIndexOfElement(this._anchor)
             });
         }
 
@@ -230,10 +301,10 @@ class Menu {
 
         }
 
-        if (divAnchor) {
+        if (this._anchor) {
             //Remove elements
-            divSurface.parentNode.removeChild(divSurface);
-            divAnchor.parentNode.removeChild(divAnchor);
+            this._main.parentNode.removeChild(this._main);
+            this._anchor.parentNode.removeChild(this._anchor);
         }
     }
 
@@ -259,22 +330,30 @@ class Menu {
      * Update the component.
      */
     update() {
-        //Create or recreate the MDCList
-        if (this._mdc) {
+        this.destroy();
+        this._createMDC();
+    }
+
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
             try {
-                this._mdc.destroy();
+                this._elem._mdc.unlisten("MDCMenu:selected", this._selectedEvent);
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
             } catch (ex) {
             }
         }
-        this._mdc = new mdc.menu.MDCMenu(this._elem.parentNode);
     }
 
     /**
      * Opens de menu.
      */
     open() {
-        if (this._mdc.open === false) {
-            this._mdc.open = true;
+        if (this._elem._mdc.open === false) {
+            this._elem._mdc.open = true;
         }
     }
 
@@ -282,8 +361,8 @@ class Menu {
      * Closes de menu.
      */
     close() {
-        if (this._mdc.open === true) {
-            this._mdc.open = false;
+        if (this._elem._mdc.open === true) {
+            this._elem._mdc.open = false;
         }
     }
 
@@ -297,23 +376,16 @@ class Menu {
      *   <li>rightIcon: Icon name of right side (string);</li>
      *   <li>leftImg: Image source of left side (string);</li>
      *   <li>rightImg: Image source of right side (string);</li>
+     *   <li>disabled: If true, the item is disabled (boolean);</li>
      *   <li>command: Text of Keyboard command list (string);</li>
      *   <li>separator: if true, it is a separator. Only this attribute is necessary (boolean)</li>
-     *   <li>onclick: Text of Javascript code to be executed when item is clicked (string);</li>
+     *   <li>onselected: Javascript text or function to be called when item is selected by click or
+     *                   SPACE/ENTER key (string|function).</li>
      * </ul>
      *
      * @param {json[]} items List of items. Each item is a Json
      */
     setItems(items) {
-        //Destroy the MDC
-        if (this._mdc !== null) {
-            try {
-                this._mdc.destroy();
-                this._mdc = null;
-            } catch (ex) {
-            }
-        }
-
         //Build the items
         this._elem.innerHTML = "";
         for (let i = 0; i < items.length; i++) {
@@ -343,11 +415,11 @@ class Menu {
             if (items[i].command) {
                 li.dataset.command = items[i].command;
             }
-            if (items[i].onclick) {
-                li.codeOfClick = items[i].onclick;
-                li.onclick = function () {
-                    eval(this.codeOfClick);
-                };
+            if (items[i].disabled === true) {
+                li.dataset.disabled = "true";
+            }
+            if (items[i].onselected) {
+                li.onselected = items[i].onselected;
             }
         }
 

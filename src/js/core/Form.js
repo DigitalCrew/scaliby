@@ -52,6 +52,29 @@ class Form {
     }
 
     /**
+     * Gets the input component from form.
+     *
+     * @param {string} formId    ID of form. If null, the "fieldName" parameter is the ID of element
+     * @param {string} fieldName Name of field
+     *
+     * @return {Object} the input component.
+     */
+    static getComponent(formId, fieldName) {
+        let elem;
+
+        if (formId) {
+            elem = document.getElementById(formId + "_" + fieldName);
+            if (!elem) {
+                elem = document.getElementById(formId).querySelector("[name='" + fieldName + "']");
+            }
+        } else {
+            elem = document.getElementById(fieldName);
+        }
+
+        return elem.component;
+    }
+
+    /**
      * Gets the input component element from form.
      *
      * @param {string} formId    ID of form. If null, the "fieldName" parameter is the ID of element

@@ -14,16 +14,15 @@
 class LoadingSpinner {
     /**
      * Disables the focus of elements and builds a list of disabled focus elements.
-     * <br>
-     * The structure of each list item:
-     * <ul>
-     *   <li>elem: Element with disabled focus (Object);</li>
-     *   <li>tabIndex: The original value (int).</li>
-     * </ul>
      *
      * @param {Object} elem Element with another elements
      *
      * @return {Array} a list of disabled focus elements.
+     * The structure of each list item:
+     * <ul>
+     *   <li>elem: Element with disabled focus (Object);</li>
+     *   <li>tabIndex: The original value (number).</li>
+     * </ul>
      *
      * @private
      */
@@ -49,7 +48,7 @@ class LoadingSpinner {
     /**
      * Enables the focus of elements.
      *
-     * @param {Object} elems List o structure of locked elements. See Comm._disableFocus()
+     * @param {Object} elems List o structure of locked elements. See LoadingSpinner._disableFocus()
      *
      * @private
      */
@@ -181,9 +180,9 @@ class LoadingSpinner {
      * <br>
      * The structure of each list item:
      * <ul>
-     *   <li>{Object} elem - The locked element. If empty, don't lock. If null, locks the body;</li>
-     *   <li>{Object} spinner - the spinner element;</li>
-     *   <li>{Object} tabIndexList - List with elements with disabled focus. See Comm._disableFocus().</li>
+     *   <li>elem - The locked element. If empty, don't lock. If null, locks the body (Object);</li>
+     *   <li>spinner - the spinner element (Object);</li>
+     *   <li>tabIndexList - List with elements with disabled focus. See LoadingSpinner._disableFocus() (Array).</li>
      * </ul>
      */
     static createAndlockElements(elems) {
@@ -238,7 +237,7 @@ class LoadingSpinner {
             }
 
             try {
-                Comm._enableFocus(elems[i].tabIndexList);
+                LoadingSpinner._enableFocus(elems[i].tabIndexList);
             } catch (error) {
             }
         }

@@ -15,14 +15,62 @@ class List {
     /** Element of component. */
     _elem;
 
-    /** MDC framework. */
-    _mdc;
 
+    /**
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+        this._elem._mdc = new mdc.list.MDCList(this._elem);
+        this._elem._mdc.singleSelection = false;
+    }
+
+    /**
+     * Disable or enable an item.
+     * Observation: Workaround when item is disabled.
+     *
+     * @param {Object} li     Item element
+     * @param {boolean} state If true, disable the element, otherwise enable it
+     *
+     * @private
+     */
+    _disableItem(li, state) {
+        if (state === true) {
+            li.classList.remove("mdc-list-item");
+            li.classList.add("mdc-list-item--disabled");
+            li.classList.add("list-item-disabled");
+        } else {
+            li.classList.remove("mdc-list-item--disabled");
+            li.classList.remove("list-item-disabled");
+            li.classList.add("mdc-list-item");
+        }
+    }
+
+    /**
+     * Put the CSS style when item is collapsed or expanded.
+     *
+     * @param {Object} li     Item element
+     * @param {boolean} state If true, the element is collapsed, otherwise it is expanded
+     *
+     * @private
+     */
+    _setCollapseItemCss(li, state) {
+        if (state === true) {
+            li.classList.add("list-item-collapsed");
+            this._disableItem(li, true);
+        } else
+        {
+            li.classList.remove("list-item-collapsed");
+            this._disableItem(li, li.dataset.disabled === "true" || li.dataset.type === "end-sublist");
+        }
+    }
 
     /**
      * Creates the component.
      *
-     * @param {object} elem Input element of component
+     * @param {Object} elem Input element of component
      *
      * @private
      */
@@ -37,10 +85,7 @@ class List {
         });
 
         //List of "li"
-        let items = [];
-        for (let i = 0; i < this._elem.children.length; i++) {
-            items[i] = this._elem.children[i];
-        }
+        let items = [...this._elem.children];
 
         let itemClass = ["mdc-list-item"];
         if (this._elem.dataset.itemClass) {
@@ -92,6 +137,9 @@ class List {
                     classes: itemClass,
                     content: ""
                 });
+                if (items[i].dataset.disabled === "true") {
+                    this._disableItem(items[i], true);
+                }
 
                 if (items[i].dataset.selected === "true") {
                     Base.configElement(items[i], {
@@ -99,6 +147,13 @@ class List {
                         attrs: ["aria-selected", "true", "tabindex", "0"]
                     });
                 }
+
+                //Event of selection by SPACE or ENTER keys
+                items[i].addEventListener("keyup", function(event) {
+                    if (event.keyCode === 32 || event.keyCode === 13) {
+                        event.target.click();
+                    }
+                });
 
                 //Left Image
                 if (items[i].dataset.leftImg) {
@@ -203,7 +258,7 @@ class List {
                     //Item within a sublist
                     items[i].style.maxHeight = "0px";
                     items[i].style.transition = "max-height 0.2s";
-                    items[i].classList.add("list-item-collapsed");
+                    this._setCollapseItemCss(items[i], true);
                 }
 
                 if (items[i].dataset.type === "start-sublist") {
@@ -225,10 +280,16 @@ class List {
                     //Item that end sublist
                     leftPadding = leftPadding.substring(0, leftPadding.length - "&nbsp;&nbsp;".length);
                     items[i].style.display = "none";
+                    this._disableItem(items[i], true);
                     withinSublist--;
                 } else {
                     //Item click Event
                     this._addItemClickEvent(items[i]);
+                }
+
+                //Item selected event
+                if (items[i].dataset.onselected) {
+                    items[i].onselected = items[i].dataset.onselected;
                 }
             }
         }
@@ -253,6 +314,10 @@ class List {
      * @private
      */
     _addItemClickEvent(item) {
+        if (item.dataset.disabled === "true") {
+            return;
+        }
+
         let list = this;
         item.addEventListener("click", function (event) {
             let li = event.currentTarget;
@@ -283,11 +348,21 @@ class List {
                     attrs: ["aria-selected", "true", "tabindex", "0"]
                 });
             }
+
+            //Treat event of selected item
+            if (item.onselected) {
+                if (typeof item.onselected === "string") {
+                    eval(item.onselected);
+                } else {
+                    item.onselected();
+                }
+            }
         });
     }
 
     /**
      * Expands or collapses a sublist.
+     * Observation: this = item clicked.
      *
      * @param event Click event
      *
@@ -299,6 +374,7 @@ class List {
         let list = item.parentNode;
         let items = list.children;
         let total = items.length;
+        let component = Scaliby.getComponent(this.parentNode);
 
         if (index + 1 === total) {
             //Sublist is empty
@@ -319,7 +395,7 @@ class List {
                 //Expand the sublist
                 if (anotherSublist === 0) {
                     items[i].style.maxHeight = "80px";
-                    items[i].classList.remove("list-item-collapsed");
+                    component._setCollapseItemCss(items[i], false);
                     if (items[i].spanArrow) {
                         items[i].spanArrow.innerHTML = "keyboard_arrow_down";
                     }
@@ -327,8 +403,8 @@ class List {
             } else {
                 //Collapse the sublist
                 items[i].style.maxHeight = "0px";
-                items[i].classList.add("list-item-collapsed");
-                    if (items[i].spanArrow) {
+                component._setCollapseItemCss(items[i], true);
+                if (items[i].spanArrow) {
                         items[i].spanArrow.innerHTML = "keyboard_arrow_up";
                     }
             }
@@ -385,14 +461,21 @@ class List {
      */
     update() {
         //Create or recreate the MDCList
-        if (this._mdc) {
+        this.destroy();
+        this._createMDC();
+    }
+
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
             try {
-                this._mdc.destroy();
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
             } catch (ex) {
             }
         }
-        this._mdc = new mdc.list.MDCList(this._elem);
-        this._mdc.singleSelection = false;
     }
 
     /**
@@ -452,10 +535,11 @@ class List {
      *   <li>rightImg: Image source of right side (string);</li>
      *   <li>value: Value of item (string);</li>
      *   <li>selected: If true, the item is selected (boolean);</li>
+     *   <li>disabled: If true, the item is disabled (boolean);</li>
      *   <li>separator: if true, it is a separator. Only this attribute is necessary (boolean)</li>
      *   <li>group: If informed and not empty, it is a group. Only this attribute is necessary (string)</li>
-     *   <li>clickFunc: Function or name of function to be called when item is clicked. Receives the Event object by
-     *       parameter (object or string);</li>
+     *   <li>onselected: Javascript text or function to be called when item is selected by click or
+     *                   SPACE/ENTER key (string|function).</li>
      *   <li>startSublist: Indicates that this item has a sublist (boolean);</li>
      *   <li>endSublist: Indicates that the sublist has ended (boolean).</li>
      * </ul>
@@ -464,14 +548,7 @@ class List {
      * @param {boolean} update If true, update the sub lists components
      */
     setItems(items, update) {
-        //Destroy MDCList
-        if (this._mdc) {
-            try {
-                this._mdc.destroy();
-                this._mdc = null;
-            } catch (ex) {
-            }
-        }
+        this.destroy();
 
         //Build the items
         this._elem.innerHTML = "";
@@ -511,15 +588,11 @@ class List {
             if (items[i].selected) {
                 li.dataset.selected = items[i].selected;
             }
-            if (items[i].clickFunc) {
-                if (typeof items[i].clickFunc === "string") {
-                    li.clickFuncName = items[i].clickFunc;
-                    li.onclick = function (event) {
-                        Base.executeFunctionByName(this.clickFuncName, event);
-                    }
-                } else {
-                    li.onclick = items[i].clickFunc;
-                }
+            if (items[i].disabled === true) {
+                li.dataset.disabled = "true";
+            }
+            if (items[i].onselected) {
+                li.onselected = items[i].onselected;
             }
             if (items[i].startSublist === true) {
                 li.dataset.type = "start-sublist";

@@ -15,9 +15,6 @@ class Switch {
     /** Element of component. */
     _elem;
 
-    /** MDC framework. */
-    _mdc;
-
     /** Container of elements. */
     _container;
 
@@ -27,9 +24,22 @@ class Switch {
     /** Element with message error. */
     _errorElement;
 
+    /* Main element. */
+    _main;
+
     /** Div that contains the elements of component. */
     _divBox;
 
+
+    /**
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+        this._elem._mdc = new mdc.switchControl.MDCSwitch(this._main);
+    }
 
     /**
      * Create the event handlers.
@@ -43,12 +53,12 @@ class Switch {
 
         elem.addEventListener("focus", function () {
             divBox.classList.add("input-bg-focus");
-            Base.addMandatoryIcon(elem, false, true, label, elem.dataset.label);
+            Base.addMandatoryIcon(elem, true, true, label, elem.dataset.label);
         });
 
         elem.addEventListener("blur", function () {
             divBox.classList.remove("input-bg-focus");
-            Base.addMandatoryIcon(elem, false, false, label, elem.dataset.label);
+            Base.addMandatoryIcon(elem, true, false, label, elem.dataset.label);
         });
 
         //Click on box
@@ -91,7 +101,7 @@ class Switch {
         this._divBox = Base.createElement({
             tag: "div",
             id: elem.id + "_box",
-            classes: ["switch-box", "input-bg", "mdc-text-field"],
+            classes: ["switch-box", "input-bg"],
             parent: this._container
         });
 
@@ -99,14 +109,15 @@ class Switch {
         this._label = Base.createElement({
             tag: "label",
             id: elem.id + "_label",
-            classes: ["switch-label", "mdc-floating-label", "mdc-floating-label--float-above"],
+            classes: ["switch-label"],
             parent: this._divBox
         });
 
         //Create the main element
-        let divMain = Base.createElement({
+        this._main = Base.createElement({
             tag: "div",
             classes: ["mdc-switch"],
+            styles: ["left", "22px"],
             parent: this._divBox
         });
 
@@ -114,14 +125,14 @@ class Switch {
         Base.createElement({
             tag: "div",
             classes: ["mdc-switch__track"],
-            parent: divMain
+            parent: this._main
         });
 
         //Create the underlay
         let divUnderlay = Base.createElement({
             tag: "div",
             classes: ["mdc-switch__thumb-underlay"],
-            parent: divMain
+            parent: this._main
         });
 
         //Create the thumb
@@ -150,7 +161,7 @@ class Switch {
 
         //Final settings
         this._createEvents();
-        this._mdc = new mdc.switchControl.MDCSwitch(divMain);
+        this._createMDC();
         this.update();
         if (this._elem.dataset.oncreated) {
             eval(this._elem.dataset.oncreated);
@@ -163,13 +174,13 @@ class Switch {
     update() {
         this._text.innerHTML = this._elem.dataset.text;
         this._label.innerHTML = this._elem.dataset.label;
-        this._mdc.checked = this._elem.checked;
+        this._elem._mdc.checked = this._elem.checked;
         Base.showInputMessageError(this._elem);
         Base.addMandatoryIcon(this._elem, true, this._elem.classList.contains("input-bg-focus"), this._label,
             this._elem.dataset.label);
         Base.showInputComponent(this._elem);
 
-        this._mdc.disabled = this._elem.disabled;
+        this._elem._mdc.disabled = this._elem.disabled;
         if (this._elem.disabled) {
             this._divBox.classList.add("input-bg-disabled");
             this._label.style.opacity = "0.70";
@@ -178,6 +189,19 @@ class Switch {
             this._divBox.classList.remove("input-bg-disabled");
             this._label.style.opacity = "1";
             this._text.style.opacity = "1";
+        }
+    }
+
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
+            try {
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
+            } catch (ex) {
+            }
         }
     }
 

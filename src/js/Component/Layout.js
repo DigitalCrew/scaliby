@@ -15,11 +15,19 @@ class Layout {
     /** Element of component. */
     _elem;
 
-    /** MDC framework. */
-    _mdc;
-
     /** Sidebar element. */
     _sidebar;
+
+
+    /**
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+        this._elem._mdc = new mdc.drawer.MDCDrawer(this._sidebar);
+    }
 
 
     /**
@@ -129,7 +137,7 @@ class Layout {
                     insertAt: 0
                 });
                 button.addEventListener("click", function () {
-                    elem.component._mdc.open = !elem.component._mdc.open;
+                    elem.component._elem._mdc.open = !elem.component._elem._mdc.open;
                 });
             }
         }
@@ -202,13 +210,8 @@ class Layout {
         }
 
         //Create or recreate the MDCDrawer
-        if (this._mdc !== null) {
-            try {
-                this._mdc.destroy();
-            } catch (ex) {
-            }
-        }
-        this._mdc = new mdc.drawer.MDCDrawer(this._sidebar);
+        this.destroy();
+        this._createMDC();
 
         //Adjust the height of content area
         let elem = this._elem;
@@ -222,17 +225,30 @@ class Layout {
     }
 
     /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
+            try {
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
+            } catch (ex) {
+            }
+        }
+    }
+
+    /**
      * Opens the drawer.
      */
     openDrawer() {
-        this._mdc.open = true;
+        this._elem._mdc.open = true;
     }
 
     /**
      * Closes the drawer.
      */
     closeDrawer() {
-        this._mdc.open = false;
+        this._elem._mdc.open = false;
     }
 
     /**

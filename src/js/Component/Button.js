@@ -15,8 +15,16 @@ class Button {
     /** Element of component. */
     _elem;
 
-    /** MDC framework. */
-    _mdc;
+
+    /**
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+        this._elem._mdc = new mdc.ripple.MDCRipple(this._elem);
+    }
 
 
     /**
@@ -30,6 +38,13 @@ class Button {
         }
         elem.component = this;
         this._elem = elem;
+
+        //Create the ripple
+        Base.createElement({
+            tag: "div",
+            classes: ["mdc-button__ripple"],
+            parent: elem
+        });
 
         //Create the label
         let content = elem.innerHTML;
@@ -48,9 +63,9 @@ class Button {
         });
 
         Base.setBackgroundColorByTheme(elem, elem, false);
-        this._mdc = new mdc.ripple.MDCRipple(elem);
 
         //Final settings
+        this._createMDC();
         this.update();
         if (this._elem.dataset.oncreated) {
             eval(this._elem.dataset.oncreated);
@@ -108,6 +123,19 @@ class Button {
                 content: this._elem.dataset.rightIcon,
                 parent: this._elem
             });
+        }
+    }
+
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
+            try {
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
+            } catch (ex) {
+            }
         }
     }
 

@@ -15,9 +15,6 @@ class Progress {
     /** Element of component. */
     _elem;
 
-    /** MDC framework. */
-    _mdc;
-
     /** Container of elements. */
     _container;
 
@@ -27,6 +24,16 @@ class Progress {
     /** If true, the component is visible. */
     _visible = true;
 
+
+    /**
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+        this._elem._mdc = new mdc.linearProgress.MDCLinearProgress(this._elem);
+    }
 
     /**
      * Constructor.
@@ -89,7 +96,7 @@ class Progress {
         });
 
         //Final settings
-        this._mdc = new mdc.linearProgress.MDCLinearProgress(this._elem);
+        this._createMDC();
 
         this.update();
         if (this._elem.dataset.oncreated) {
@@ -101,9 +108,9 @@ class Progress {
      * Update the component.
      */
     update() {
-        this._mdc.progress = this._progress;
+        this._elem._mdc.progress = this._progress;
         if (this._elem.dataset.buffering) {
-            this._mdc.buffer = this._elem.dataset.buffering;
+            this._elem._mdc.buffer = this._elem.dataset.buffering;
         }
         if (this._elem.dataset.indeterminate === "true") {
             this._elem.classList.add("mdc-linear-progress--indeterminate");
@@ -118,19 +125,41 @@ class Progress {
     }
 
     /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
+            try {
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
+            } catch (ex) {
+            }
+        }
+    }
+
+    /**
+     * Gets the container of elements.
+     *
+     * @return {Element} the container.
+     */
+    getContainer() {
+        return this._elem;
+    }
+
+    /**
      * Sets the progress of bar.
      *
      * @param {number} value Value of progress (0 - 1)
      */
     setProgress(value) {
-        this._mdc.progress = value;
+        this._elem._mdc.progress = value;
     }
 
     /**
      * Shows the bar.
      */
     show() {
-        this._mdc.open();
+        this._elem._mdc.open();
         this._visible = true;
     }
 
@@ -138,7 +167,7 @@ class Progress {
      * Hides the bar.
      */
     hide() {
-        this._mdc.close();
+        this._elem._mdc.close();
         this._visible = false;
     }
 
@@ -149,15 +178,6 @@ class Progress {
      */
     isVisible() {
         return this._visible;
-    }
-
-    /**
-     * Gets the container of elements.
-     *
-     * @return {Element} the container.
-     */
-    getContainer() {
-        return this._elem;
     }
 
 }

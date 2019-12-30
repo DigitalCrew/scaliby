@@ -15,9 +15,19 @@ class Tab {
     /** Element of component. */
     _elem;
 
-    /** MDC framework. */
-    _mdc;
+    /* Main element. */
+    _main;
 
+
+    /**
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+        this._elem._mdc = new mdc.tabBar.MDCTabBar(this._main);
+    }
 
     /**
      * Shows the selected tab area.
@@ -75,7 +85,7 @@ class Tab {
         let tab = this;
 
         //Create tab bar
-        let divBar = Base.createElement({
+        this._main = Base.createElement({
             tag: "div",
             classes: ["mdc-tab-bar"],
             attrs: ["role", "tablist"]
@@ -85,7 +95,7 @@ class Tab {
         let divScroller = Base.createElement({
             tag: "div",
             classes: ["mdc-tab-scroller"],
-            parent: divBar
+            parent: this._main
         });
 
         //Create the content area
@@ -209,8 +219,8 @@ class Tab {
         }
 
         //Create the component
-        this._elem.insertBefore(divBar, this._elem.firstChild);
-        this._mdc = new mdc.tabBar.MDCTabBar(divBar);
+        this._elem.insertBefore(this._main, this._elem.firstChild);
+        this._createMDC();
 
         //Final settings
         this.update();
@@ -226,6 +236,19 @@ class Tab {
     update() {
         //Show the selected content tab
         this._tabShowSelected();
+    }
+
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
+            try {
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
+            } catch (ex) {
+            }
+        }
     }
 
     /**

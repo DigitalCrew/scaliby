@@ -15,15 +15,28 @@ class Checkbox {
     /** Element of component. */
     _elem;
 
-    /** MDC framework. */
-    _mdc;
-
     /** Container of elements. */
     _container;
 
     /** Div that contains the elements of component. */
     _divBox;
 
+    /* Main element. */
+    _main;
+
+    /* Div of checkbox component. */
+    _divCheck;
+
+
+    /**
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+        this._elem._mdc = new mdc.checkbox.MDCCheckbox(this._divCheck);
+    }
 
     /**
      * Create the event handlers.
@@ -123,7 +136,7 @@ class Checkbox {
         elem.component = this;
         this._elem = elem;
 
-        //Create the main element
+        //Create the div that contains the elements of component
         this._divBox = Base.createElement({
             tag: "div",
             classes: ["input-bg", "input-box-div"],
@@ -132,7 +145,7 @@ class Checkbox {
         });
 
         //Create the main element
-        let divMain = Base.createElement({
+        this._main = Base.createElement({
             tag: "div",
             classes: ["mdc-form-field"],
             styles: ["align-items", "inherit"],
@@ -140,10 +153,10 @@ class Checkbox {
         });
 
         //Create the inner div
-        let divInner = Base.createElement({
+        this._divCheck = Base.createElement({
             tag: "div",
             classes: ["mdc-checkbox"],
-            parent: divMain
+            parent: this._main
         });
 
         //Configure the element
@@ -152,7 +165,7 @@ class Checkbox {
             this._container.counter = 1;
         }
 
-        $(elem).appendTo(divInner);
+        $(elem).appendTo(this._divCheck);
         Base.configElement(elem, {
             id: Form.get(elem).id + "_" + elem.name + "_" + this._container.counter++,
             classes: ["mdc-checkbox__native-control"]
@@ -162,7 +175,7 @@ class Checkbox {
         let divBg = Base.createElement({
             tag: "div",
             classes: ["mdc-checkbox__background"],
-            parent: divInner
+            parent: this._divCheck
         });
 
         //Create the checkmark and path
@@ -178,12 +191,19 @@ class Checkbox {
             parent: divBg
         });
 
+        //Create the ripple
+        Base.createElement({
+            tag: "div",
+            classes: ["mdc-checkbox__ripple"],
+            parent: this._divCheck
+        });
+
         //Create the option label
         Base.createElement({
             tag: "label",
             styles: ["margin-top", "10px", "cursor", "pointer", "will-change", "transform"],
             attrs: ["for", elem.id],
-            parent: divMain
+            parent: this._main
         });
 
         //If first check, configure the container that contains all checks
@@ -193,7 +213,7 @@ class Checkbox {
 
         //Final settings
         this._createEvents();
-        this._mdc = new mdc.checkbox.MDCCheckbox(this._divBox);
+        this._createMDC();
         this.update();
         if (this._elem.dataset.oncreated) {
             eval(this._elem.dataset.oncreated);
@@ -212,7 +232,7 @@ class Checkbox {
             this._container.label, this._container.dataset.label);
         Base.showInputComponent(this._elem);
 
-        this._mdc.disabled = this._elem.disabled;
+        this._elem._mdc.disabled = this._elem.disabled;
         if (this._elem.disabled) {
             this._divBox.classList.add("input-bg-disabled");
             this._container.label.parentNode.classList.add("input-bg-disabled");
@@ -229,6 +249,19 @@ class Checkbox {
                 let optionLabel = checks[i].parentNode.parentNode.querySelector("label");
                 optionLabel.innerHTML = checks[i].dataset.text;
                 optionLabel.style.opacity = this._elem.disabled ? "0.40" : "1";
+            }
+        }
+    }
+
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
+            try {
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
+            } catch (ex) {
             }
         }
     }

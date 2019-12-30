@@ -19,7 +19,7 @@ class Panel {
     /**
      * Constructor.
      *
-     * @param {object} elem Input element of component
+     * @param {Object} elem Input element of component
      */
     constructor(elem) {
         if (elem.component) {
@@ -44,7 +44,7 @@ class Panel {
                 insertAt: 0
             });
             Base.setBackgroundColorByTheme(this._elem, divTitle, false);
-            Base.setTextColorByTheme(this._elem, divTitle)
+            Base.setTextColorByTheme(this._elem, divTitle, false);
         }
 
         //Final settings
@@ -58,6 +58,12 @@ class Panel {
      * Update the component.
      */
     update() {
+    }
+
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
     }
 
 }

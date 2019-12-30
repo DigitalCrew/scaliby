@@ -39,6 +39,9 @@ class FileUploader {
     /** Div that contains the files information. */
     _divFile;
 
+    /** List of request objects. */
+    _requestList = [];
+
 
     /**
      * Shows the information of chosen files.
@@ -104,7 +107,7 @@ class FileUploader {
      *
      * @param {string} name Name of file
      *
-     * @return {Element} div with the elements
+     * @return {Object} div with the elements
      *
      * @private
      */
@@ -166,17 +169,18 @@ class FileUploader {
      * Uploads the file.
      *
      * @param {Object} file     File data
-     * @param {Element} icon    Icon of cancel
+     * @param {Object} icon     Icon of cancel
      * @param {Object} progress Progress component
-     * @param {Element} div     Div with all elements of file
+     * @param {Object} div      Div with all elements of file
      *
      * @private
      */
     _uploadFile(file, icon, progress, div) {
         progress.setProgress(0);
 
-        let uploadFile = this;
+        let component = this;
         let request = new XMLHttpRequest();
+        this._requestList[this._requestList.length] = request;
         let data = new FormData();
         data.append("file", file);
 
@@ -190,19 +194,22 @@ class FileUploader {
             if (request.readyState === 4) {
                 if (request.status === 200) {
                     //Success. Remove progress and allow download of the file
-                    uploadFile._allowDownload(div, file.name);
+                    component._removeRequest(request);
+                    component._allowDownload(div, file.name);
                 } else {
                     //Error. Remove file and show the message
+                    component._removeRequest(request);
                     let msg = Scaliby.getConfiguration().messages.fileUploader.sendError;
                     msg = msg.replace("$", file.name);
                     Alert.showError(msg, 10);
+                    component._destroyProgress(div);
                     div.parentNode.removeChild(div);
                 }
             }
         };
 
         //Event of aborted operation when icon is clicked
-        icon.addEventListener("click", function() { uploadFile._abortUpload(request, div, file.name); });
+        icon.addEventListener("click", function() { component._abortUpload(request, div, file.name); });
 
         //Send POST request to the server
         if (this._elem.dataset.urlSend) {
@@ -217,12 +224,13 @@ class FileUploader {
      * Aborts the upload.
      *
      * @param {Object} request Instance of XMLHttpRequest
-     * @param {Element} div    Div with all elements of file
+     * @param {Object} div     Div with all elements of file
      * @param {string} name    Name of file
      *
      * @private
      */
     _abortUpload(request, div, name) {
+        this._removeRequest(request);
         request.onreadystatechange = null;
         request.abort();
         try {
@@ -232,6 +240,7 @@ class FileUploader {
                 lockedList: [],
                 type: "POST"
             });
+            this._destroyProgress(div);
             div.parentNode.removeChild(div);
         } catch (ex) {
             console.error(ex);
@@ -241,7 +250,7 @@ class FileUploader {
     /**
      * Adjusts the file to allow download.
      *
-     * @param {Element} div  Div with all elements of file
+     * @param {Object} div   Div with all elements of file
      * @param {string}  name Name of file
      * @param {string=} code Code of file. Informs this code only if the file was added by method
      *
@@ -260,6 +269,8 @@ class FileUploader {
                 Comm.request(url);
             }]
         });
+
+        this._destroyProgress(div);
         let progress = div.querySelector(".s-progress");
         if (progress) {
             progress.parentNode.removeChild(progress);
@@ -284,11 +295,36 @@ class FileUploader {
         return name.substring(index + 1).toLowerCase();
     }
 
+    /**
+     * Search for "progress" components and destroy them.
+     *
+     * @param elem Initial element to search for "progress" component
+     *
+     * @private
+     */
+    _destroyProgress(elem) {
+        let list = elem.querySelectorAll(".s-progress");
+        list.forEach((el) => { Scaliby.getComponent(el).destroy(); });
+    }
+
+    /**
+     * Remove a request of list.
+     *
+     * @param request Request to be removed
+     *
+     * @private
+     */
+    _removeRequest(request) {
+        try {
+            component._requestList.splice(component._requestList.indexOf(request), 1);
+        } catch (ex) {
+        }
+    }
 
     /**
      * Constructor.
      *
-     * @param {object} elem Input element of component
+     * @param {Object} elem Input element of component
      */
     constructor(elem) {
         if (elem.component) {
@@ -323,7 +359,7 @@ class FileUploader {
         this._button = Base.createElement({
             tag: "button",
             classes: ["s-button"],
-            content: "Anexar",
+            content: "<i class='material-icons'>attachment</i>",
             parent: divButton,
             events: ["click", function() { input.value = ""; input.click(); }]
         });
@@ -380,13 +416,26 @@ class FileUploader {
                 this._maxSizeText = size + "KB";
             }
         }
+    }
 
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        this._destroyProgress(this._elem);
+        this._requestList.forEach((request) => {
+            try {
+                request.abort();
+            } catch (ex) {
+            }
+        });
+        this._requestList = [];
     }
 
     /**
      * Gets the container of elements.
      *
-     * @return {Element} the container.
+     * @return {Object} the container.
      */
     getContainer() {
         return this._elem;

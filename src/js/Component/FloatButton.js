@@ -15,9 +15,16 @@ class FloatButton {
     /** Element of component. */
     _elem;
 
-    /** MDC framework. */
-    _mdc;
 
+    /**
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+        this._elem._mdc = new mdc.ripple.MDCRipple(this._elem);
+    }
 
     /**
      * Constructor.
@@ -31,6 +38,7 @@ class FloatButton {
         elem.component = this;
         this._elem = elem;
 
+        //Configure the element
         this._elem.type = "button";
         this._elem.classList.add("mdc-fab");
         Base.setBackgroundColorByTheme(this._elem, this._elem, false);
@@ -42,6 +50,14 @@ class FloatButton {
             this._elem.classList.add("mdc-fab--extended");
         }
 
+        //Create the ripple
+        Base.createElement({
+            tag: "div",
+            classes: ["mdc-fab__ripple"],
+            parent: elem
+        });
+
+        //Create the icon
         if (this._elem.dataset.icon !== undefined) {
             let icon = Scaliby.createIcon(this._elem.dataset.icon);
             if (this._elem.dataset.icon.startsWith("x1-")) {
@@ -56,6 +72,7 @@ class FloatButton {
         }
 
         //Final settings
+        this._createMDC();
         this.update();
         if (this._elem.dataset.oncreated) {
             eval(this._elem.dataset.oncreated);
@@ -67,5 +84,19 @@ class FloatButton {
      */
     update() {
     }
+
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
+            try {
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
+            } catch (ex) {
+            }
+        }
+    }
+
 
 }

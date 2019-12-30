@@ -59,6 +59,7 @@ class Dialog {
         let divSurface = Base.createElement({
             tag: "div",
             classes: ["mdc-dialog__surface"],
+            styles: ["overflow", "visible"],
             parent: divContainer
         });
 
@@ -75,6 +76,7 @@ class Dialog {
             tag: "div",
             id: "system_dialog_content",
             classes: ["mdc-dialog__content"],
+            styles: ["overflow", "visible"],
             parent: divSurface
         });
 
@@ -93,35 +95,38 @@ class Dialog {
             parent: this._dialog
         });
 
-        //Accept button
-        this._buttonAccept = Base.createElement({
-            tag: "button",
-            id: "system_dialog_button_accept",
-            classes: ["mdc-button", "mdc-dialog__button"],
-            attrs: ["display", "none"],
-            content: "<i class='material-icons'>check</i><span id='system_dialog_accept_label'></span>",
-            parent: footer
-        });
-        //this._buttonAccept.dataset.mdcDialogAction = "accept";
-
         //Decline button
         this._buttonDecline = Base.createElement({
             tag: "button",
-            id: "system_dialog_button_decline",
             classes: ["mdc-button", "mdc-dialog__button"],
-            styles: ["display", "none"],
-            content: "<i class='material-icons'>close</i><span id='system_dialog_decline_label'></span>",
+            attrs: ["type", "button"],
+            content: "<div class='mdc-button__ripple'></div>" +
+                "<i class='material-icons mdc-button__icon' aria-hidden='true'>close</i>" +
+                "<span id='system_dialog_decline_label' class='mdc-button__label'></span>",
             parent: footer
         });
-        this._buttonDecline.dataset.mdcDialogAction = "cancel";
+        this._buttonDecline.dataset.mdcDialogAction = "close";
+
+        //Accept button
+        this._buttonAccept = Base.createElement({
+            tag: "button",
+            classes: ["mdc-button", "mdc-dialog__button"],
+            attrs: ["type", "button"],
+            content: "<div class='mdc-button__ripple'></div>" +
+                "<i class='material-icons mdc-button__icon' aria-hidden='true'>check</i>" +
+                "<span id='system_dialog_accept_label' class='mdc-button__label'></span>",
+            parent: footer
+        });
+        this._buttonAccept.dataset.mdcDialogAction = "accept";
 
         //OK button
         this._buttonOk = Base.createElement({
             tag: "button",
-            id: "system_dialog_button_ok",
             classes: ["mdc-button", "mdc-dialog__button"],
-            styles: ["display", "none"],
-            content: "<i class='material-icons'>check</i><span id='system_dialog_ok_label'></span>",
+            attrs: ["type", "button"],
+            content: "<div class='mdc-button__ripple'></div>" +
+                "<i class='material-icons mdc-button__icon' aria-hidden='true'>check</i>" +
+                "<span id='system_dialog_ok_label' class='mdc-button__label'></span>",
             parent: footer
         });
         this._buttonOk.dataset.mdcDialogAction = "accept";
@@ -167,6 +172,8 @@ class Dialog {
                     Base.insertElementAt(source, source.dialogParent, source.dialogPositionAtParent);
                 }
             }
+
+            Scaliby.destroyMdcComponents(contentElement);
             contentElement.innerHTML = "";
         });
     }
@@ -230,23 +237,21 @@ class Dialog {
     /**
      * Shows a modal dialog with "OK" button.
      *
-     * @param {string} title   Title of dialog
-     * @param {object} content Text of dialog if string or element with content
-     * @param {function} onOk  Function that treats the click event on the "OK" button
+     * @param {string} title          Title of dialog
+     * @param {string|Object} content Text of dialog if string or element with content
+     * @param {function} onOk         Function that treats the click event on the "OK" button
      */
     static showOk(title, content, onOk) {
-        //let value = typeof content === 'string' || content instanceof String ? content : content.innerHTML;
-        //$("#system_dialog_content").html(value);
         this._putContent(content);
-
         document.getElementById("system_dialog_title").innerHTML = title;
-        document.getElementById("system_dialog_button_ok").style.display = "inline-flex";
-        document.getElementById("system_dialog_button_decline").style.display = "none";
-        document.getElementById("system_dialog_button_accept").style.display = "none";
 
-        document.getElementById("system_dialog_button_accept").clickEvent = null;
-        document.getElementById("system_dialog_button_decline").clickEvent = null;
-        document.getElementById("system_dialog_button_ok").clickEvent = onOk;
+        this._buttonOk.classList.remove("hide-element");
+        this._buttonDecline.classList.add("hide-element");
+        this._buttonAccept.classList.add("hide-element");
+
+        this._buttonOk.clickEvent = onOk;
+        this._buttonDecline.clickEvent = null;
+        this._buttonAccept.clickEvent = null;
 
         this._mdcDialog.open();
     }
@@ -254,25 +259,23 @@ class Dialog {
     /**
      * Shows a modal dialog with "Accept" and "Decline" buttons.
      *
-     * @param {string} title       Title of dialog
-     * @param {object} content     Text of dialog if string or element with content
-     * @param {function} onAccept  Function that treats the click event on the "Accept" button. If this function returns
-     *                             true, the dialog is close, otherwise, keep opened
-     * @param {function} onDecline Function that treats the click event on the "Decline" button
+     * @param {string} title          Title of dialog
+     * @param {string|Object} content Text of dialog if string or element with content
+     * @param {function} onAccept     Function that treats the click event on the "Accept" button. If this function
+     *                                returns true, the dialog is close, otherwise, keep opened
+     * @param {function} onDecline    Function that treats the click event on the "Decline" button
      */
     static showConfirmation(title, content, onAccept, onDecline) {
-        //let value = typeof content === 'string' || content instanceof String ? content : content.innerHTML;
-        //document.getElementById("system_dialog_content").innerHTML = value;
         this._putContent(content);
-
         document.getElementById("system_dialog_title").innerHTML = title;
-        document.getElementById("system_dialog_button_ok").style.display = "none";
-        document.getElementById("system_dialog_button_decline").style.display = "inline-flex";
-        document.getElementById("system_dialog_button_accept").style.display = "inline-flex";
 
-        document.getElementById("system_dialog_button_accept").clickEvent = onAccept;
-        document.getElementById("system_dialog_button_decline").clickEvent = onDecline;
-        document.getElementById("system_dialog_button_ok").clickEvent = null;
+        this._buttonDecline.classList.remove("hide-element");
+        this._buttonAccept.classList.remove("hide-element");
+        this._buttonOk.classList.add("hide-element");
+
+        this._buttonDecline.clickEvent = onDecline;
+        this._buttonAccept.clickEvent = onAccept;
+        this._buttonOk.clickEvent = null;
 
         this._mdcDialog.open();
     }
@@ -283,5 +286,4 @@ class Dialog {
     static close() {
         this._mdcDialog.close();
     }
-
 }

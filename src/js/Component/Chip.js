@@ -15,6 +15,14 @@ class Chip {
     /** Element of component. */
     _elem;
 
+    /** Element that contains the chip. */
+    _chipset;
+
+    /** Element that contains the button. */
+    _gridcell;
+
+
+
     /** Image of component. */
     _divImage;
 
@@ -23,6 +31,17 @@ class Chip {
 
     /** Text of component. */
     _divText;
+
+
+    /**
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+        this._elem._mdc = new mdc.chips.MDCChipSet(this._chipset);
+    }
 
 
     /**
@@ -37,74 +56,47 @@ class Chip {
         elem.component = this;
         this._elem = elem;
 
-        //Configure the element
-        this._elem.classList.add("mdc-chip");
-
-        //Image on the left
-        if (this._elem.dataset.image) {
-            if (this._elem.dataset.align !== "right") {
-                this._divImage = Base.createElement({
-                    tag: "img",
-                    attrs: ["src", this._elem.dataset.image],
-                    parent: this._elem
-                });
-            }
-        }
-
-        //Icon on the left
-        if (this._elem.dataset.icon) {
-            if (this._elem.dataset.align !== "right") {
-                this._divIcon = Scaliby.createIcon(this._elem.dataset.icon);
-                Base.configElement(this._divIcon, {
-                    classes: ["mdc-chip__icon", "mdc-chip__icon--leading"],
-                    styles: ["font-size", "18px"],
-                    parent: this._elem
-                });
-            }
-        }
-
-        //Text
-        this._divText = Base.createElement({
+        //Create the chipset
+        this._chipset = Base.createElement({
             tag: "div",
-            classes: ["mdc-chip__text"],
+            classes: ["mdc-chip-set"],
+            styles: ["display", "inline"],
+            attrs: ["role", "grid"],
+            parent: this._elem.parentNode,
+            insertAt: Base.getIndexOfElement(this._elem)
+        });
+
+        //Configure the element
+        Base.configElement(this._elem, {
+            classes: ["mdc-chip"],
+            attrs: ["role", "row"],
+            parent: this._chipset
+        });
+
+        //Create the line ripple
+        Base.createElement({
+            tag: "div",
+            classes: ["mdc-chip__ripple"],
             parent: this._elem
         });
 
-        //Icon on th right
-        if (elem.dataset.icon) {
-            if (this._elem.dataset.align === "right") {
-                this._divIcon = Scaliby.createIcon(this._elem.dataset.icon);
-                Base.configElement(this._divIcon, {
-                    classes: ["mdc-chip__icon", "mdc-chip__icon--trailing"],
-                    styles: ["font-size", "18px"],
-                    parent: this._elem
-                });
-            }
-        }
+        //Create the gridcell
+        let gridcell = Base.createElement({
+            tag: "span",
+            attrs: ["role", "gridcell"],
+            parent: this._elem
+        });
 
-        //Image on the right
-        if (elem.dataset.image) {
-            if (this._elem.dataset.align === "right") {
-                this._divImage = Base.createElement({
-                    id: this._elem.id + "_divImage",
-                    tag: "img",
-                    parent: this._elem
-                });
-            }
-        }
-
-        //Focusable
-        if (this._elem.dataset.focusable === "true") {
-            this._elem.setAttribute("tabIndex", "0");
-            this._elem.classList.add("mdc-chip-set--input");
-        }
-
-        //Adjust the parent to align a set of chips
-        Base.configElement(this._elem.parentNode, {
-            classes: ["chip-parent"]
+        //Create the button
+        this._button = Base.createElement({
+            tag: "span",
+            classes: ["mdc-chip__text"],
+            attrs: ["role", "button"],
+            parent: gridcell
         });
 
         //Final settings
+        this._createMDC();
         this.update();
         if (this._elem.dataset.oncreated) {
             eval(this._elem.dataset.oncreated);
@@ -115,9 +107,71 @@ class Chip {
      * Update the component.
      */
     update() {
-        this._divText.innerHTML = this._elem.dataset.text;
-        if (this._divImage) {
-            this._divImage.src = this._elem.dataset.image;
+        //Set icons, images and text
+        this._button.innerHTML = "";
+
+        if (this._elem.dataset.leftIcon) {
+            let img = Scaliby.createIcon(this._elem.dataset.leftIcon);
+            Base.configElement(img, {
+                classes: ["mdc-chip__icon", "mdc-chip__icon--leading"],
+                styles: ["font-size", "20px"],
+                parent: this._button
+            });
+        }
+
+        if (this._elem.dataset.leftImage) {
+            this._divImage = Base.createElement({
+                tag: "img",
+                classes: ["chip-image"],
+                attrs: ["src", this._elem.dataset.leftImage],
+                parent: this._button
+            });
+        }
+
+        Base.createElement({
+            tag: "span",
+            content: this._elem.dataset.text,
+            parent: this._button
+        });
+
+        if (this._elem.dataset.rightImage) {
+            this._divImage = Base.createElement({
+                tag: "img",
+                classes: ["chip-image"],
+                attrs: ["src", this._elem.dataset.rightImage],
+                parent: this._button
+            });
+        }
+
+        if (this._elem.dataset.rightIcon) {
+            let img = Scaliby.createIcon(this._elem.dataset.rightIcon);
+            Base.configElement(img, {
+                classes: ["mdc-chip__icon", "mdc-chip__icon--trailing"],
+                styles: ["font-size", "20px"],
+                parent: this._button
+            });
+        }
+
+        //Adjust the tab index
+        let component = this;
+        setTimeout(function() {
+            if (component._elem.tabIndex !== -2) {
+                component._button.tabIndex = component._elem.tabIndex;
+                component._elem.tabIndex = -2;
+            }
+        }, 100);
+    }
+
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
+            try {
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
+            } catch (ex) {
+            }
         }
     }
 

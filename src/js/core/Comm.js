@@ -71,7 +71,7 @@ class Comm {
 
                         if (xhr.getResponseHeader("append") === "true") {
                             if (Scaliby.isDebug() === true) {
-                                console.log("APPEND(" + target.id + " / layer=" + hasLayer + "): " + data);
+                                console.log("APPEND(" + target.id + " / layer=" + hasLayer + "): ", [data]);
                             }
                             if (hasLayer) {
                                 Layer.appendInCurrentLayer(target.id, data);
@@ -81,11 +81,12 @@ class Comm {
                         } else {
                             let preData = Comm._executeFunctionBeforeReplace(attrs.path, target.id);
                             if (Scaliby.isDebug() === true) {
-                                console.log("REPLACE(" + target.id + " / layer=" + hasLayer + "): " + preData + data);
+                                console.log("REPLACE(" + target.id + " / layer=" + hasLayer + "): ", [preData + data]);
                             }
                             if (hasLayer) {
                                 Layer.show(target.id, preData + data);
                             } else {
+                                Scaliby.destroyMdcComponents(target);
                                 $(target).html(preData + data);
                             }
                         }

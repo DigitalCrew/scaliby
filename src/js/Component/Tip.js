@@ -73,7 +73,7 @@ class Tip {
     _doCountdown() {
         this._divCountdown.innerHTML = this._seconds;
         if (this._seconds === 0) {
-            this.close(this._elem.id);
+            this.destroy(this._elem.id);
         } else {
             this._seconds--;
         }
@@ -95,7 +95,7 @@ class Tip {
 
         //Remove a "tip" in execution associate with the element if exist
         if (this._target.tipInExecution) {
-            this._target.tipInExecution.close();
+            this._target.tipInExecution.destroy();
         }
 
         //Create the component with 3 "div"s
@@ -169,7 +169,7 @@ class Tip {
         let elem = this._elem;
         divText.addEventListener("click", function (event) {
             if (event.target.tagName !== "IMG") {
-                tip.close(elem.id);
+                tip.destroy(elem.id);
                 event.preventDefault();
                 return false;
             }
@@ -200,7 +200,7 @@ class Tip {
                 || target.style.opacity === "0" || target.classList.contains("hide-element")
                 || (cell != null && cell.classList.contains("hide-element")
                     || (grid != null && grid.classList.contains("hide-element")))) {
-                tip.close();
+                tip.destroy();
             }
         }, 250);
     }
@@ -258,14 +258,13 @@ class Tip {
     }
 
     /**
-     * Closes the tip.
+     * Clean up the component.
      */
-    close() {
+    destroy() {
         clearInterval(this._timer);
         clearInterval(this._updatePosition);
         this._elem.parentNode.removeChild(this._elem);
         this._target.tipInExecution = null;
     }
-
 
 }

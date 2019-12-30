@@ -15,30 +15,21 @@ class IconButton {
     /** Element of component. */
     _elem;
 
-    /** MDC framework. */
-    _mdc;
-
     /** MDC of toggle effect. */
     _toggleButton = null;
 
 
     /**
-     * Gets the state.
+     * Creates the MDC component.
      *
-     * @return {boolean} true if on, otherwise false.
+     * @private
      */
-    getState() {
-        return this._toggleButton.on;
+    _createMDC() {
+        this.destroy();
+        this._elem._mdc = new mdc.ripple.MDCRipple(this._elem);
+        this._elem._mdc.unbounded = true;
     }
 
-    /**
-     * Sets the state.
-     *
-     * @param {boolean} value True if on, otherwise false
-     */
-    setState(value) {
-        this._toggleButton.on = value;
-    }
 
     /**
      * Constructor.
@@ -53,32 +44,23 @@ class IconButton {
         this._elem = elem;
 
         //Configure the element
-        //this._elem.type = "button";
-        //this._elem.classList.add("mdc-icon-button");
-        //--mdc-ripple-fg-size:28px; --mdc-ripple-fg-scale:1.71429; --mdc-ripple-left:10px; --mdc-ripple-top:10px;
         Base.configElement(this._elem, {
             classes: ["mdc-icon-button"],
             attrs: ["type", "button"]
         });
 
-
-
-        this._mdc = new mdc.ripple.MDCRipple(this._elem);
-        this._mdc.unbounded = true;
-
         //Final settings
+        this._createMDC();
         this.update();
         if (this._elem.dataset.oncreated) {
             eval(this._elem.dataset.oncreated);
         }
 
-        //Issue not found! Without this style change, the ripple is not displayed when the mouse pointer is over the
-        //icon, only after the first click
+        //After component creation, the style needs to be removed because the ripple is not displayed when the mouse
+        //pointer is over the icon, only after the first click.
         setTimeout(function() {
-            elem.style = "--mdc-ripple-fg-size:28px; --mdc-ripple-fg-scale:1.71429; --mdc-ripple-left:10px; " +
-                "--mdc-ripple-top:10px;";
-        }, 250);
-
+            elem.classList.remove("mdc-ripple-upgraded");
+        }, 100);
     }
 
     /**
@@ -113,5 +95,37 @@ class IconButton {
             }
         }
     }
+
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
+            try {
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
+            } catch (ex) {
+            }
+        }
+    }
+
+    /**
+     * Gets the state.
+     *
+     * @return {boolean} true if on, otherwise false.
+     */
+    getState() {
+        return this._toggleButton.on;
+    }
+
+    /**
+     * Sets the state.
+     *
+     * @param {boolean} value True if on, otherwise false
+     */
+    setState(value) {
+        this._toggleButton.on = value;
+    }
+
 
 }

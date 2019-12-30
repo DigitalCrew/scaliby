@@ -54,4 +54,10 @@ class Divider {
         Base.configElement(this._elem, { styles: ["width", "100%", "border-top", border] });
     }
 
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+    }
+
 }

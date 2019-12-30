@@ -558,6 +558,14 @@ class Listing {
     }
 
     /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        $(this._elem).dataTable().api().clear();
+        $(this._elem).dataTable().api().destroy();
+    }
+
+    /**
      * Reloads the listing data.
      */
     refresh() {

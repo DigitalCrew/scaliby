@@ -15,9 +15,6 @@ class Textarea {
     /** Element of component. */
     _elem;
 
-    /** MDC framework. */
-    _mdc;
-
     /** Container of elements. */
     _container;
 
@@ -27,6 +24,19 @@ class Textarea {
     /** Element with message error. */
     _errorElement;
 
+    /* Main element. */
+    _main;
+
+
+    /**
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+        this._elem._mdc = new mdc.textField.MDCTextField(this._main);
+    }
 
     /**
      * Create the event handlers.
@@ -35,26 +45,51 @@ class Textarea {
      */
     _createEvents() {
         let elem = this._elem;
+        let component = this;
+
+        elem.addEventListener("change", function() {
+            component._showLine();
+        });
 
         elem.addEventListener("focus", function () {
-            elem.parentNode.classList.add("text-field-textarea-focus");
+            elem.parentNode.classList.add("textarea-line-focus");
+            elem.parentNode.classList.add("input-bg-focus");
         });
 
         elem.addEventListener("blur", function () {
-            elem.parentNode.classList.remove("text-field-textarea-focus");
+            elem.parentNode.classList.remove("textarea-line-focus");
+            elem.parentNode.classList.remove("input-bg-focus");
         });
 
         elem.addEventListener("mouseover", function () {
-            if (Base.currentElementFocused === elem) {
-                elem.parentNode.classList.remove("text-field-textarea-hover");
+            if (elem.value === "" && elem.required === true) {
+                elem.parentNode.classList.add("textarea-line_error-hover");
             } else {
-                elem.parentNode.classList.add("text-field-textarea-hover");
+                elem.parentNode.classList.add("textarea-line-hover");
             }
+            elem.parentNode.classList.add("input-bg");
         });
 
         elem.addEventListener("mouseout", function () {
-            elem.parentNode.classList.remove("text-field-textarea-hover");
+            elem.parentNode.classList.remove("textarea-line-hover");
+            elem.parentNode.classList.remove("textarea-line_error-hover");
+            elem.parentNode.classList.add("input-bg");
         });
+    }
+
+    /**
+     * Shows the bottom line of component.
+     *
+     * @private
+     */
+    _showLine() {
+        this._elem.parentNode.classList.remove("textarea-line");
+        this._elem.parentNode.classList.remove("textarea-line_error");
+        if (this._elem.value === "" && this._elem.required === true) {
+            this._elem.parentNode.classList.add("textarea-line_error");
+        } else {
+            this._elem.parentNode.classList.add("textarea-line");
+        }
     }
 
 
@@ -79,19 +114,19 @@ class Textarea {
         });
 
         //Create the main element
-        let div = Base.createElement({
+        this._main = Base.createElement({
             tag: "div",
-            classes: ["mdc-text-field", "mdc-text-field--textarea", "input-fullwidth"],
+            classes: ["mdc-text-field", "mdc-text-field--textarea", "textarea-line"],
             styles: ["height", "auto"],
             parent: this._container
         });
 
         //Configure the element
-        $(this._elem).appendTo(div);
+        $(this._elem).appendTo(this._main);
         Base.configElement(this._elem, {
             generateId: true,
             classes: ["mdc-text-field__input"],
-            styles: ["border-bottom", "1px solid", "opacity", "0.7"]
+            styles: ["margin-top", "14px"]
         });
 
         //Create the label
@@ -100,16 +135,16 @@ class Textarea {
             id: this._elem.id + "_label",
             content: this._elem.dataset.label,
             classes: ["mdc-floating-label"],
-            styles: ["top", "20x"],
+            styles: ["margin-left", "12px", "top", "12px"],
             attrs: ["for", this._elem.id],
-            parent: div
+            parent: this._main
         });
 
         //Create the line ripple
         Base.createElement({
             tag: "div",
             classes: ["mdc-line-ripple"],
-            parent: div
+            parent: this._main
         });
 
         //Create the error message
@@ -121,7 +156,7 @@ class Textarea {
 
         //Final settings
         this._createEvents();
-        this._mdc = new mdc.textField.MDCTextField(div);
+        this._createMDC();
         this.update();
         if (this._elem.dataset.oncreated) {
             eval(this._elem.dataset.oncreated);
@@ -134,9 +169,23 @@ class Textarea {
     update() {
         this._label.innerHTML = this._elem.dataset.label;
         Base.showInputMessageError(this._elem);
-        this._mdc.value = this._elem.value;
-        this._mdc.disabled = this._elem.disabled;
+        this._elem._mdc.value = this._elem.value;
+        this._elem._mdc.disabled = this._elem.disabled;
         Base.showInputComponent(this._elem);
+        this._showLine();
+    }
+
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
+            try {
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
+            } catch (ex) {
+            }
+        }
     }
 
     /**

@@ -108,6 +108,7 @@ class Layer {
         let totalLayers = Layer._elementsWithLayers[id].total;
         if (totalLayers !== elem.children.length) {
             while (elem.children.length > 0) {
+                Scaliby.destroyMdcComponents(elem.children[0]);
                 elem.removeChild(elem.children[0]);
             }
             totalLayers = 0;
@@ -131,7 +132,8 @@ class Layer {
      */
     static appendInCurrentLayer(id, content) {
         let elem = document.getElementById(id);
-        $(elem.children[elem.children.length - 1]).append(content);
+        let parent = elem.children[elem.children.length - 1];
+        $(parent).append(content);
     }
 
     /**
@@ -146,6 +148,7 @@ class Layer {
         //Remove the last content
         let lastLayer = elem.children[elem.children.length - 1];
         Layer._removeEventsOfLayer(elem, lastLayer);
+        Scaliby.destroyMdcComponents(lastLayer);
         elem.removeChild(lastLayer);
         Layer._elementsWithLayers[elem.id].total = Layer._elementsWithLayers[elem.id].total - 1;
 
@@ -165,6 +168,7 @@ class Layer {
         let elem = document.getElementById(id);
 
         while (elem.children.length > 0) {
+            Scaliby.destroyMdcComponents(elem.children[0]);
             elem.removeChild(elem.children[0]);
         }
 

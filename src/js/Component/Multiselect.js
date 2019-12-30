@@ -18,21 +18,259 @@ class Multiselect {
     /** Container of elements. */
     _container;
 
+    /** Main element. */
+    _main;
+
     /** Label of component. */
     _label;
 
     /** Element with message error. */
     _errorElement;
 
-    /** Box with selected options. */
-    _divBox;
+    /** Menu element. */
+    _menu;
 
-    /** The line. */
-    _divLine;
+    /** UL element of options. */
+    _ul;
 
-    /** Main element. */
-    _div;
+    /** Anchor element. */
+    _anchor;
 
+    /** The selected text area. */
+    _selectedTextArea;
+
+    /** The box with selected text area and selected options. */
+    _selectedOptionsBox;
+
+    /** If true, the component is totally created. */
+    _created = false;
+
+
+    /**
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+
+        this._elem._mdc = new mdc.select.MDCSelect(this._main);
+        this._elem.component = this;
+
+        this._main.elem = this._elem;
+        this._elem._mdc.listen("MDCSelect:change", this._changeEvent);
+    }
+
+    /**
+     * Disable or enable an item.
+     * Observation: Workaround when item is disabled.
+     *
+     * @param {Object} li     Item element
+     * @param {boolean} state If true, disable the element, otherwise enable it
+     *
+     * @private
+     */
+    _disableItem(li, state) {
+        if (state === true) {
+            li.classList.remove("mdc-list-item");
+            li.classList.add("mdc-list-item--disabled");
+            li.classList.add("list-item-disabled");
+        } else {
+            li.classList.remove("mdc-list-item--disabled");
+            li.classList.remove("list-item-disabled");
+            li.classList.add("mdc-list-item");
+        }
+    }
+
+    /**
+     * Component event listener of changed value.
+     * Observation: this = main element.
+     *
+     * @private
+     */
+    _changeEvent() {
+        let component = this.elem.component;
+        let elem = component._elem;
+
+        if (component._created && elem._mdc !== null && elem._mdc.selectedIndex !== -1) {
+            //The selected option of MDC Select has been changed. Select same item in the "select" element
+            for (let i = 0; i < elem.options.length; i++) {
+                if (elem.options[i].value === elem._mdc.value) {
+                    elem.options[i].selected = true;
+                    break;
+                }
+            }
+
+            component._showSelectedOptions();
+
+            //The dispatch is asynchronous for the MDC event to end. Thus, if the listener calls for a component
+            //update (which needs to rebuild the MDC), this process is done without error.
+            setTimeout(function () {
+                //Dispatch the event
+                Scaliby.dispatchEvent(component._elem, "change");
+
+                //Open the menu
+                component._elem._mdc.getDefaultFoundation().adapter_.openMenu();
+            }, 100);
+        }
+    }
+
+    /**
+     * Shows the selected options.
+     *
+     * @private
+     */
+    _showSelectedOptions() {
+        let component = this;
+        let list = [];
+        this._selectedTextArea.innerHTML = "";
+        for (let i = 0; i < this._elem.options.length; i++) {
+            if (this._elem.options[i].selected === true) {
+                //Create selected option
+                let classes = ["multiselect-option-selected"];
+                if (this._elem.disabled) {
+                    classes[1] = "multiselect-option-selected_disabled";
+                }
+                let option = Base.createElement({
+                    tag: "div",
+                    classes: classes,
+                    content: this._ul.childNodes[i].innerHTML,
+                    parent: this._selectedTextArea,
+                    events: ["click", function(event) {
+                        //Remove selected option
+                        if (event.target.classList.contains("multiselect-option-selected")) {
+                            component._elem._mdc.getDefaultFoundation().adapter_.closeMenu();
+                            component._removeSelectedOption(event.target);
+                            Scaliby.dispatchEvent(component._elem, "change");
+                        }
+                    }]
+                });
+                option.value = this._elem.options[i].value;
+                list[list.length] = option;
+
+                //Hide selected option in menu
+                for (let j = 0; j < this._ul.childNodes.length; j++) {
+                    if (this._ul.childNodes[j].dataset.value === this._elem.options[i].value) {
+                        this._ul.childNodes[j].classList.add("hide-element");
+                        this._ul.childNodes[j].classList.add("mdc-list-item-disabled");
+                        //this._ul.childNodes[j].classList.add("list-item-disabled");
+                        break;
+                    }
+                }
+            }
+        }
+
+        //Adjust the width of selected options
+        setTimeout(function() {
+            if (component._elem.dataset.visible !== "false" && list.length > 0) {
+                let width = component._container.offsetWidth - 60;
+                list.forEach((option) => option.style.width = width + "px");
+            }
+        }, 100);
+    }
+
+    /**
+     * Removes a selected option.
+     *
+     * @param {Object} option Selected option element
+     *
+     * @private
+     */
+    _removeSelectedOption(option) {
+        //Uncheck the "select" option and verify if has option selected
+        let hasSelected = false;
+        for (let i = 0; i < this._elem.options.length; i++) {
+           if (this._elem.options[i].value === option.value) {
+               this._elem.options[i].selected = false;
+           }
+            if (this._elem.options[i].selected === true) {
+                hasSelected = true;
+            }
+        }
+
+        //Show the MDC Select option
+        for (let i = 0; i < this._ul.childNodes.length; i++) {
+            if (this._ul.childNodes[i].dataset.value === option.value) {
+                this._disableItem(this._ul.childNodes[i], false);
+                break;
+            }
+        }
+
+        //Remove the selected option
+        option.parentNode.removeChild(option);
+
+        //If there isn't selected option, it tells MDC Select that it hasn't option selected either
+        if (!hasSelected) {
+            this._elem._mdc.selectedIndex = -1;
+
+            //Close de menu
+            let component = this;
+            setTimeout(function() {
+                component._elem._mdc.getDefaultFoundation().adapter_.closeMenu();
+            }, 100)
+        }
+    }
+
+    /**
+     * Creates the menu items (options).
+     *
+     * @param {json[]}  op List of options. Each option is a Json. See Multiselect.setOptions()
+     */
+    _createItems(op) {
+        //Create the elements of component
+        this.destroy();
+        this._createElements();
+
+        //Build the new options
+        let component = this;
+        for (let i = 0; i < op.length; i++) {
+            let li = Base.createElement({
+                tag: "li",
+                classes: ["mdc-list-item"],
+                parent: this._ul
+            });
+
+            if (op[i].disabled === true) {
+                li.classList.remove("mdc-list-item");
+                this._disableItem(li, true);
+            }
+
+            if (op[i].selected === true) {
+                li.classList.add("mdc-list-item--selected");
+            }
+
+            li.dataset.value = op[i].value;
+
+            if (op[i].separator === true) {
+                //Separator
+                Base.createElement({
+                    tag: "hr",
+                    classes: ["mdc-list-divider"],
+                    styles: ["width", "100%"],
+                    attrs: ["role", "separator"],
+                    content: op[i].innerHTML,
+                    parent: li
+                });
+                this._disableItem(li, true);
+            } else {
+                //Text
+                li.innerHTML = op[i].text;
+            }
+
+            //Propagate the blur event to "select" element
+            li.addEventListener("blur", function() {
+                setTimeout(function() {
+                    if (!Base.hasElement(component._main, Scaliby.getCurrentFocusedElement())) {
+                        component._main.classList.remove("mdc-select--activated");
+                        Scaliby.dispatchEvent(component._elem, "blur");
+                    }
+                }, 100);
+            });
+        }
+
+        //Create the MDC
+        this._createMDC();
+    }
 
     /**
      * Create the event handlers.
@@ -41,128 +279,108 @@ class Multiselect {
      */
     _createEvents() {
         let elem = this._elem;
-        let div = this._div;
-        let divLine = this._divLine;
-        let label = this._label;
-        let multiselect = this;
+        let component = this;
 
-        //When area is clicked, open options
-        div.addEventListener("click", function () {
-            if (elem.disabled) {
-                return;
-            }
-            label.classList.add("mdc-floating-label--float-above");
-            elem.style.left = "0px";
-            elem.focus();
-        });
-
-        //Focus on Select
-        elem.addEventListener("focus", function () {
-            Base.addMandatoryIcon(elem, elem.required, true, label, elem.dataset.label);
-            divLine.classList.add("multiselect-line-focus");
-            div.classList.add("input-bg-focus");
-        });
-
-        //Select loses focus
-        elem.addEventListener("blur", function () {
-            elem.style.left = "-8000px";
-            Base.addMandatoryIcon(elem, elem.required, false, label, elem.dataset.label);
-            label.classList.remove("mdc-floating-label--float-above");
-            divLine.classList.remove("multiselect-line-focus");
-            div.classList.remove("input-bg-focus");
-        });
-
-        //Click on option
-        elem.addEventListener("click", function (event) {
-            if (event.target.tagName !== "OPTGROUP" && event.target !== elem) {
-                multiselect._clickEventOfSelected(event.target);
+        //Propagate the focus to "select" element
+        this._selectedTextArea.addEventListener("focus", function () {
+            if (component._main.classList.contains("mdc-select--activated") !== true) {
+                Scaliby.dispatchEvent(elem, "focus");
             }
         });
 
-        //Prevent keys
-        elem.addEventListener("keydown", function (event) {
-            if (event.which !== 9) {
-                event.preventDefault();
-                return false;
-            }
-        });
+        //Redirect the focus event to the component
+        elem.focus = function () {
+            component._selectedTextArea.focus();
+        };
 
-        //Options selected by click and drag
-
-        elem.addEventListener("change", function (e) {
-            for (let i = 0; i < elem.options.length; i++) {
-                if (elem.options[i].selected) {
-                    multiselect._clickEventOfSelected(elem.options[i]);
-                }
+        //Propagate the blur to "select" element
+        this._selectedTextArea.addEventListener("blur", function () {
+            if (component._main.classList.contains("mdc-select--activated") !== true) {
+                Scaliby.dispatchEvent(elem, "blur");
             }
         });
     }
 
     /**
-     * Treats the click event on selected option (multi select).
-     *
-     * @param option Clicked option
+     * Creates the elements of component.
      *
      * @private
      */
-    _clickEventOfSelected(option) {
-        this._selectOption(option);
-        this._elem.blur();
-        this._elem.focus();
-    }
+    _createElements() {
+        this._container.innerHTML = "";
 
-    /**
-     * Selects an available option (multi select).
-     *
-     * @param option Clicked option
-     *
-     * @private
-     */
-    _selectOption(option) {
-        let elem = this._elem;
-        let divBox = this._divBox;
-
-        if (option.style.display === "none") {
-            return;
-        }
-        option.style.display = "none";
-
-        let divAux = Base.createElement({
+        //Create the main element
+        this._main = Base.createElement({
             tag: "div",
-            classes: ["multiselect-option-selected"],
-            content: option.innerHTML,
-            parent: this._divBox
-        });
-        divAux.option = option;
-
-        divAux.addEventListener("mousedown", function (event) {
-            if (elem.disabled === false) {
-                divAux.option.style.display = "block";
-                this.parentNode.removeChild(this);
-                divAux.option.selected = false;
-                elem.focus();
-                event.preventDefault();
-                return false;
-            }
+            classes: ["mdc-select", "input-fullwidth"],
+            parent: this._container
         });
 
-        let selectedOptions = $(divBox).find("div");
-        for (let i = 0; i < selectedOptions.length; i++) {
-            selectedOptions[i].option.selected = true;
-        }
+        //Configure the element
+        Base.configElement(this._elem, {
+            generateId: true,
+            styles: ["display", "none"],
+            parent: this._main
+        });
 
-        for (let i = 0; i < elem.options.length; i++) {
-            if (elem.options[i].disabled === false && elem.options[i].style.display !== "none") {
-                return;
-            }
-        }
+        //Create the anchor element
+        this._anchor = Base.createElement({
+            tag: "div",
+            classes: ["mdc-select__anchor", "input-fullwidth"],
+            styles: ["height", "100%", "min-height", "42px", "display", "grid"],
+            parent: this._main
+        });
+
+        //Create the dropdown icon
+        Base.createElement({
+            tag: "i",
+            classes: ["mdc-select__dropdown-icon"],
+            parent: this._anchor
+        });
+
+        //Create the selected text area
+        this._selectedTextArea = Base.createElement({
+            tag: "div",
+            classes: ["mdc-select__selected-text"],
+            styles: ["height", "100%", "min-height", "42px", "display", "grid"],
+            parent: this._anchor
+        });
+
+        //Create the label
+        this._label = Base.createElement({
+            tag: "span",
+            classes: ["mdc-floating-label"],
+            content: this._elem.dataset.label,
+            parent: this._anchor
+        });
+
+        //Create the line ripple
+        Base.createElement({
+            tag: "div",
+            classes: ["mdc-line-ripple"],
+            parent: this._anchor
+        });
+
+        //Create the menu with items(options)
+        this._menu = Base.createElement({
+            tag: "div",
+            classes: ["mdc-select__menu", "mdc-menu", "mdc-menu-surface", "input-fullwidth"],
+            parent: this._main
+        });
+
+        //Create the "ul" of menu
+        this._ul = Base.createElement({
+            tag: "ul",
+            classes: ["mdc-list"],
+            parent: this._menu
+        });
     }
 
 
     /**
      * Constructor.
      *
-     * @param {object} elem Input element of component
+     * @param {Object} elem Input element of component
      */
     constructor(elem) {
         if (elem.component) {
@@ -179,56 +397,8 @@ class Multiselect {
             insertAt: Base.getIndexOfElement(this._elem)
         });
 
-        //Create the main element
-        this._div = Base.createElement({
-            tag: "div",
-            classes: ["mdc-text-field", "multiselect-div", "input-bg", "input-fullwidth"],
-            styles: ["overflow", "visible"],
-            parent: this._container
-        });
-
-        //Configure the element
-        Base.configElement(this._elem, {
-            generateId: true,
-            classes: ["multiselect", "mdc-select__native-control"],
-            parent: this._div
-        });
-
-        //Create the label
-        this._label = Base.createElement({
-            tag: "label",
-            id: this._elem.id + "_label",
-            classes: ["mdc-floating-label"],
-            attrs: ["for", this._elem.id],
-            styles: ["cursor", "pointer", "position", "absolute", "top", "10px", "bottom", "12px"],
-            parent: this._div
-        });
-
-        //Create the line
-        this._divLine = Base.createElement({
-            tag: "div",
-            id: this._elem.id + "_line",
-            classes: ["mdc-text-field__input"],
-            styles: ["cursor", "pointer", "margin-right", "-26px"],
-            parent: this._div
-        });
-
-        //Create the arrow drop down
-        Base.createElement({
-            tag: "i",
-            id: this._elem.id + "_icon",
-            classes: ["material-icons", "multiselect-arrow"],
-            content: "arrow_drop_down",
-            parent: this._div
-        });
-
-        //Box with selected options
-        this._divBox = Base.createElement({
-            tag: "div",
-            id: this._elem.id + "_box",
-            classes: ["multiselect-div-box"],
-            parent: this._container
-        });
+        //Create the elements of component
+        this._createElements();
 
         //Create the error message
         this._errorElement = Base.createElement({
@@ -236,13 +406,6 @@ class Multiselect {
             classes: ["input-msg-error"],
             parent: this._container
         });
-
-        //Mark selected options
-        for (let i = 0; i < this._elem.options.length; i++) {
-            if (this._elem.options[i].selected === true) {
-                $(this._elem.options[i]).click();
-            }
-        }
 
         //Final settings
         this._createEvents();
@@ -256,28 +419,51 @@ class Multiselect {
      * Update the component.
      */
     update() {
+        //Create the options
+        let list = [];
+        for (let i = 0; i < this._elem.options.length; i++) {
+            let op = {};
+            op.value = this._elem.options[i].value;
+            op.text = this._elem.options[i].dataset.text ?
+                this._elem.options[i].dataset.text : this._elem.options[i].innerHTML;
+            op.disabled = this._elem.options[i].disabled;
+            op.selected = this._elem.options[i].selected;
+            op.separator = this._elem.options[i].dataset.separator === "true";
+            list[list.length] = op;
+        }
+        this._createItems(list, false);
+
+        //Adjust the properties
+        this._elem._mdc.disabled = this._elem.disabled;
+        this._elem._mdc.required = this._elem.required;
         this._label.innerHTML = this._elem.dataset.label;
-        Base.addMandatoryIcon(this._elem, this._elem.required, document.activeElement === this._elem, this._label,
-            this._elem.dataset.label);
         Base.showInputMessageError(this._elem);
         Base.showInputComponent(this._elem);
+        this._showSelectedOptions();
 
-        if (this._elem.disabled) {
-            this._elem.parentNode.classList.add("multiselect-disabled");
-            this._elem.parentNode.classList.add("mdc-text-field--disabled");
-            this._divBox.classList.add("multiselect-option-selected-disabled");
-        } else {
-            this._elem.parentNode.classList.remove("multiselect-disabled");
-            this._elem.parentNode.classList.remove("mdc-text-field--disabled");
-            this._divBox.classList.remove("multiselect-option-selected-disabled");
-        }
+        //Adjust the tab index of selected text area
+        let component = this;
+        setTimeout(function() {
+            if (component._elem.tabIndex !== -2) {
+                component._selectedTextArea.tabIndex = component._elem.tabIndex;
+                component._elem.tabIndex = -2;
+            }
+        }, 100);
 
-        //Build the options
-        this._divBox.innerHTML = "";
-        for (let i = 0; i < this._elem.options.length; i++) {
-            this._elem.options[i].style.display = "block";
-            if (this._elem.options[i].selected) {
-                this._selectOption(this._elem.options[i]);
+        this._created = true;
+    }
+
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
+            try {
+                this._elem._mdc.getDefaultFoundation().adapter_.closeMenu();
+                this._elem._mdc.unlisten("MDCSelect:change", this._changeEvent);
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
+            } catch (ex) {
             }
         }
     }
@@ -291,7 +477,6 @@ class Multiselect {
         return this._errorElement;
     }
 
-
     /**
      * Gets the container of elements.
      *
@@ -300,4 +485,49 @@ class Multiselect {
     getContainer() {
         return this._container;
     }
+
+    /**
+     * Defines the options of multiselect component.
+     * <br>
+     * This method is static, therefore it can be used before or after the component to be created.
+     * <br>
+     * Syntax of item JSON:
+     * <ul>
+     *   <li>value: The value of option. It can't be empty or null (string); </li>
+     *   <li>text: The text of item (string);</li>
+     *   <li>separator: if true, it is a separator. Only this attribute is necessary (boolean);</li>
+     *   <li>disabled: if true, the option is disabled (boolean);</li>
+     *   <li>selected: if true, the option is selected. Only one option can be selected (boolean).</li>
+     * </ul>
+     *
+     * @param {string} formId    ID of form. If null, the "fieldName" parameter is the ID of element
+     * @param {string} fieldName Name of field
+     * @param {json[]} op        List of options. Each option is a Json
+     */
+    static setOptions(formId, fieldName, op) {
+        //Remove the current options of select
+        let elem = Form.getField(formId, fieldName);
+        while (elem.options.length > 0) {
+            elem.remove(0);
+        }
+
+        //Build the new options
+        for (let i = 0; i < op.length; i++) {
+            let option = Base.createElement({
+                tag: "option",
+                attrs: ["value", op[i].value],
+                content: op[i].text,
+                parent: elem
+            });
+            option.selected = op[i].selected === true;
+            option.disabled = op[i].disabled === true;
+            option.dataset.separator = op[i].separator === true ? "true" : "false";
+            option.dataset.text = op[i].text;
+        }
+
+        if (elem.component) {
+            elem.component.update()
+        }
+    }
+
 }

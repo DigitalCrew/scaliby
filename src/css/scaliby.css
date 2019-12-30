@@ -2,6 +2,12 @@
  * Workaround to issues of MDC *
  *******************************/
 
+/* When auto-complete, the label stays in incorrect position (4.0.0) */
+.mdc-text-field__input:-webkit-autofill + .mdc-floating-label {
+    -webkit-transform: translateY(-19.0px) scale(0.75);
+    transform: translateY(-19.0px) scale(0.75);
+    cursor: auto;
+}
 
 /************************
  * Customization of MDC *
@@ -9,26 +15,17 @@
 
 /* Textfield */
 .mdc-text-field {
-    height: 40px;
-}
-.mdc-text-field .mdc-floating-label {
-    top: 10px;
+    height: 42px;
 }
 
 /* Textarea */
+.mdc-text-field--textarea .mdc-floating-label--float-above {
+    -webkit-transform:translateY(-12px) scale(.99);
+    -ms-transform:translateY(-12px) scale(.99);
+    transform:translateY(-12px) scale(.99)
+}
 .mdc-text-field--textarea:not(.mdc-text-field--disabled) {
     background-color: #f5f5f5;
-}
-.text-field-textarea-hover {
-    background-color: #ececec !important;
-}
-.text-field-textarea-focus {
-    background-color: #dcdcdc !important;
-}
-.mdc-text-field--textarea .mdc-floating-label--float-above {
-    -webkit-transform:translateY(-60%) scale(.90);
-    -ms-transform:translateY(-60%) scale(.90);
-    transform:translateY(-60%) scale(.90)
 }
 
 /* Button */
@@ -36,9 +33,9 @@
     margin-bottom: 4px;
 }
 
-/* Chip */
-.mdc-chip {
-    margin: 2px;
+/* Card */
+.mdc-card__actions {
+    padding: 0;
 }
 
 /* List */
@@ -47,16 +44,18 @@
 }
 
 /* Select */
-.mdc-select {
-    height: 40px;
+.mdc-select__anchor {
+    height: 42px;
+}
+.mdc-select__selected-text {
+    height: 42px;
+    padding-top: 14px;
 }
 .mdc-select .mdc-floating-label {
-    top: 10px;
+    top: 14px;
 }
-.mdc-select .mdc-floating-label--float-above {
-    -webkit-transform:translateY(-48%) scale(.75);
-    -ms-transform:translateY(-48%) scale(.75);
-    transform:translateY(-48%) scale(.75)
+.mdc-select__dropdown-icon {
+    bottom: 10px;
 }
 
 
@@ -91,7 +90,7 @@
  * Improvements and adjusts of MDC components *
  **********************************************/
 
-/* Message error */
+/* All input components */
 .input-msg-error {
     color: #b94a48;
     background-color: #f2dede;
@@ -100,19 +99,8 @@
     box-shadow:0 1px 1px 0 rgba(0,0,0,.14),0 1px 10px 0 rgba(0,0,0,.12),0 2px 4px -1px rgba(0,0,0,.2);
     width: calc(100% - 6px);
 }
-
-/* Input component */
 .input-bg {
-    display: block;
-    overflow: visible;
-}
-.input-bg::after {
-    content: none;
-    position: inherit;
-}
-.input-bg::before {
-    content: none;
-    position: inherit;
+    background-color: #f5f5f5;
 }
 .input-bg:not(.input-bg-disabled):hover {
     background-color: #ececec;
@@ -128,17 +116,54 @@
     width: 100%;
 }
 
+/* Radiobox and Checkbox. */
+.input-box-div {
+    align-items: inherit;
+    background-color: #f5f5f5;
+}
+.input-box-main-label {
+    color: rgba(0, 0, 0, 0.6);
+    background-color: #f5f5f5 !important;
+    width: 100%;
+    height: 12px;
+}
+.input-box-label {
+    position: relative;
+    display: block;
+    top: 20px;
+}
+
+/* Textarea */
+.textarea-line {
+    border-bottom: 1px solid rgba(0,0,0,.42);
+}
+.textarea-line_error {
+    border-bottom: 1px solid #b00020;
+}
+.textarea-line-hover {
+    border-bottom: 1px solid #000000;
+}
+.textarea-line_error-hover {
+    border-bottom: 1px solid #b00020;
+}
+.textarea-line-focus {
+    border-bottom: 1px solid rgba(0,0,0,0);
+}
+
 /* Switch */
 .switch-box {
-    padding-bottom: 13px;
+    display: block;
+    min-height: 54px;
 }
 .switch-label {
-    position: inherit;
     display: block;
-    top: 10px;
+    font-family: Roboto, sans-serif;
+    font-size: .75rem;
+    color: rgba(0,0,0,.6);
+    height: 20px;
 }
 .switch-text {
-    margin-left: 12px;
+    margin-left: 34px;
     font-size: .875rem;
     cursor: pointer;
     top: -2px;
@@ -146,11 +171,11 @@
 }
 
 /* Chip */
-.chip-parent {
-    display: flex;
-    padding: 4px;
-    flex-wrap: wrap;
-    box-sizing: border-box;
+.chip-image {
+    max-height: 20px;
+    margin-left: 4px;
+    margin-right: 4px;
+    vertical-align: middle;
 }
 
 /* List */
@@ -174,6 +199,18 @@
 }
 .list-item-collapsed {
     border: 0 !important;
+}
+.list-item-disabled {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 16px;
+    overflow: hidden;
+    height: 48px;
+    color: rgba(0,0,0,.50);
+    pointer-events: none;
+    tab-index: -1 !important;
 }
 
 /* Tab */
@@ -259,53 +296,25 @@ body {
 }
 
 /* Multi Select */
-.multiselect {
-    position: absolute;
-    left: -8000px;
-    z-index: 100;
-    background-color: #ffffff;
-    border: 1px solid #6200ee;
-    border-bottom: 2px solid #6200ee;
-    height: auto;
-    top: 11px;
-}
-.multiselect-div {
-    will-change: unset !important;
-    display: inline-flex;
-    position: relative;
-    align-items: flex-end;
-    box-sizing: border-box;
-    margin: 0;
-}
-.multiselect-div-box {
-    color: #000000;
-}
-.multiselect-arrow {
-    color: rgba(0,0,0,.5);
-    cursor: pointer;
-    padding: 8px 0px 9px 0px;
-}
-.multiselect-line-focus {
-    border-bottom-color: rgba(98,0,238,0.87) !important;
-}
 .multiselect-option-selected {
     display: inline-block;
     border-radius: 16px;
     color: #000000;
     background-color: rgba(0,0,0,.08);
-    padding: 4px;
+    padding-left: 8px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     margin: 1px 1px 1px 1px;
     font-size: 80%;
     cursor: pointer;
+    overflow: hidden;
 }
-.multiselect-option-selected-disabled {
-    cursor: default !important;
-    pointer-events: none;
-    opacity: 0.6;
+.multiselect-option-selected_disabled {
+    background-color: inherit;
+    color: inherit;
 }
-.multiselect-disabled {
-    cursor: default !important;
-    pointer-events: none;
+.multiselect-option-selected:hover {
+    background-color: rgba(0,0,0,.2);
 }
 
 /* Search Select */
@@ -313,15 +322,13 @@ body {
     position: absolute;
     z-index: 100;
     overflow: auto;
-    left: -8000px;
-    top: 40px;
     font-family: Roboto, sans-serif;
     font-size: 1rem;
     line-height: 1.75rem;
     font-weight: 400;
     letter-spacing: .009375em;
     white-space: nowrap;
-    width: 100%;
+    margin-top: 42px;
 }
 .searchselect-option {
     padding: 10px;
@@ -619,23 +626,6 @@ body {
 .file-uploader-name {
     margin-top: 5px;
     color: rgba(0,0,0,.6);
-}
-
-/* Radiobox and Checkbox. */
-.input-box-div {
-    align-items: inherit;
-    background-color: #f5f5f5;
-}
-.input-box-main-label {
-    color: rgba(0, 0, 0, 0.6);
-    background-color: #f5f5f5 !important;
-    width: 100%;
-    height: 12px;
-}
-.input-box-label {
-    position: relative;
-    display: block;
-    top: 10px;
 }
 
 

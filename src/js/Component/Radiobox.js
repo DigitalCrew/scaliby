@@ -15,15 +15,28 @@ class Radiobox {
     /** Element of component. */
     _elem;
 
-    /** MDC framework. */
-    _mdc;
-
     /** Container of elements. */
     _container;
 
     /** Div that contains the elements of component. */
     _divBox;
 
+    /* Main element. */
+    _main;
+
+    /* Div of radio component. */
+    _divRadio;
+
+
+    /**
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+        this._elem._mdc = new mdc.radio.MDCRadio(this._divRadio);
+    }
 
     /**
      * Create the event handlers.
@@ -128,7 +141,7 @@ class Radiobox {
         elem.component = this;
         this._elem = elem;
 
-        //Create the div with elements
+        //Create the div that contains the elements of component
         this._divBox = Base.createElement({
             tag: "div",
             classes: ["input-bg", "input-box-div"],
@@ -137,7 +150,7 @@ class Radiobox {
         });
 
         //Create the main element
-        let divMain = Base.createElement({
+        this._main = Base.createElement({
             tag: "div",
             classes: ["mdc-form-field"],
             styles: ["align-items", "inherit"],
@@ -145,10 +158,10 @@ class Radiobox {
         });
 
         //Create the inner div
-        let divInner = Base.createElement({
+        this._divRadio = Base.createElement({
             tag: "div",
             classes: ["mdc-radio"],
-            parent: divMain
+            parent: this._main
         });
 
         //Configure the element
@@ -157,7 +170,7 @@ class Radiobox {
             this._container.counter = 1;
         }
 
-        $(elem).appendTo(divInner);
+        $(elem).appendTo(this._divRadio);
         Base.configElement(elem, {
             id: Form.get(elem).id + "_" + elem.name + "_" + this._container.counter++,
             classes: ["mdc-radio__native-control"]
@@ -167,7 +180,7 @@ class Radiobox {
         let divBg = Base.createElement({
             tag: "div",
             classes: ["mdc-radio__background"],
-            parent: divInner
+            parent: this._divRadio
         });
 
         //Create the outer circle
@@ -184,12 +197,19 @@ class Radiobox {
             parent: divBg
         });
 
+        //Create the ripple
+        Base.createElement({
+            tag: "div",
+            classes: ["mdc-radio__ripple"],
+            parent: this._divRadio
+        });
+
         //Create the option label
         Base.createElement({
             tag: "label",
             styles: ["margin-top", "10px", "cursor", "pointer"],
             attrs: ["for", elem.id],
-            parent: divMain
+            parent: this._main
         });
 
         //If first radio, configure the container that contains all radios
@@ -199,7 +219,7 @@ class Radiobox {
 
         //Final settings
         this._createEvents();
-        this._mdc = new mdc.radio.MDCRadio(divMain);
+        this._createMDC();
         this.update();
         if (this._elem.dataset.oncreated) {
             eval(this._elem.dataset.oncreated);
@@ -218,7 +238,7 @@ class Radiobox {
             this._container.label, this._container.dataset.label);
         Base.showInputComponent(this._elem);
 
-        this._mdc.disabled = this._elem.disabled;
+        this._elem._mdc.disabled = this._elem.disabled;
         if (this._elem.disabled) {
             this._divBox.classList.add("input-bg-disabled");
             this._container.label.parentNode.classList.add("input-bg-disabled");
@@ -235,6 +255,19 @@ class Radiobox {
                 let optionLabel = radios[i].parentNode.parentNode.querySelector("label");
                 optionLabel.innerHTML = radios[i].dataset.text;
                 optionLabel.style.opacity = this._elem.disabled ? "0.40" : "1";
+            }
+        }
+    }
+
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
+            try {
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
+            } catch (ex) {
             }
         }
     }

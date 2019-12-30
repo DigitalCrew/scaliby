@@ -25,7 +25,7 @@ class Searchselect {
     _errorElement;
 
     /* Main element. */
-    _div;
+    _main;
 
     /** If true, doesn't update the input. */
     _doesNotUpdateInput = false;
@@ -36,10 +36,16 @@ class Searchselect {
     /* Input element. */
     _input;
 
-    /** MDC framework of input. */
-    _inputMdc;
 
-
+    /**
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+        this._elem._mdcInput = new mdc.textField.MDCTextField(this._main);
+    }
 
     /**
      * Create the event handlers.
@@ -48,27 +54,31 @@ class Searchselect {
      */
     _createEvents() {
         let elem = this._elem;
-        let label = this._label;
-        let div = this._div;
         let input = this._input;
         let divIcon = this._divIcon;
         let divSpinner = this._divSpinner;
-        let searchselect = this;
+        let component = this;
 
-        //Label clicked
-        label.addEventListener("click", function () {
-            elem.focus();
+        //Propagate the focus to "select" element
+        this._input.addEventListener("focus", function() {
+            if (component._elem.classList.contains("hide-element")) {
+                Scaliby.dispatchEvent(elem, "focus");
+            }
         });
 
-        //Focus on select
-        input.addEventListener("focus", function () {
-            div.classList.add("input-bg-focus");
-            input.focus();
-        });
+        //Redirect the focus event to the component
+        elem.focus = function () {
+            component._input.focus();
+        };
 
-        //Blur from select
-        elem.addEventListener("blur", function () {
-            div.classList.remove("input-bg-focus");
+        //Propagate the blur to "select" element
+        this._input.addEventListener("blur", function() {
+            setTimeout(function() {
+                if (!Base.hasElement(component._main, Scaliby.getCurrentFocusedElement())) {
+                    component._markSelectedOptionOfSearchSelect();
+                    Scaliby.dispatchEvent(component._elem, "blur");
+                }
+            }, 100);
         });
 
         //Click on select
@@ -83,34 +93,24 @@ class Searchselect {
                     break;
                 }
             }
-            searchselect._markSelectedOptionOfSearchSelect();
+            component._markSelectedOptionOfSearchSelect();
             setTimeout(function () {
                 input.focus();
             }, 50);
         });
 
-        //Blur from input
-        input.addEventListener("blur", function() {
-            setTimeout(function() {
-                if (Scaliby.getCurrentFocusedElement() !== searchselect._elem) {
-                    searchselect._markSelectedOptionOfSearchSelect();
-                    Base.dispatchEvent(input.select, "blur");
-                }
-            }, 50);
-        });
-
         //Click on input
         input.addEventListener("click", function () {
-            Base.dispatchEvent(input.select, "click");
+            Scaliby.dispatchEvent(component._elem, "click");
         });
 
         //Key down on input
         input.addEventListener("keydown", function (event) {
-            if ($(elem).css("left") !== "0px" || elem.options.length === 0) {
+            if (elem.classList.contains("hide-element") || elem.options.length === 0) {
                 return;
             }
 
-            searchselect._doesNotUpdateInput = true;
+            component._doesNotUpdateInput = true;
             let index = elem.selectedIndex;
             let newIndex = index;
             if (event.keyCode === 38) { //UP
@@ -132,11 +132,11 @@ class Searchselect {
                 elem.selectedIndex = newIndex;
                 event.preventDefault();
             } else if (event.keyCode === 13) { //ENTER
-                searchselect._markSelectedOptionOfSearchSelect();
+                component._markSelectedOptionOfSearchSelect();
                 event.preventDefault();
                 input.focus();
             }
-            searchselect._doesNotUpdateInput = false;
+            component._doesNotUpdateInput = false;
         });
 
         //Selected index changed
@@ -147,7 +147,7 @@ class Searchselect {
             },
             set: function (index) {
                 this.oldSelectedIndex = index;
-                if (this.doNotUpdateInput === false) {
+                if (component._doesNotUpdateInput === false) {
                     if (index === -1) {
                         input.value = "";
                     } else {
@@ -171,24 +171,32 @@ class Searchselect {
             //Verify the typed text to start a search
             elem.dataset.value = $(input).val();
             let text = input.value;
-            if (searching || text.length < 2 || text === lastText
-                || !elem.dataset.search || event.keyCode === 13) {
+
+            if (searching || text === lastText || !elem.dataset.search || event.keyCode === 13) {
                 lastText = text;
+                return;
+            }
+
+            if (text.length < elem.dataset.minLetters) {
+                component._deselectAll();
+                lastText = text;
+                input.value = text;
+                elem.classList.add("hide-element");
                 return;
             }
             lastText = text;
             searching = true;
 
             //Show option box without options
-            elem.style.left = "0px";
-            elem.style.size = "2";
+            elem.classList.remove("hide-element");
+            elem.style.width = input.offsetWidth + "px";
             elem.innerHTML = "";
             divIcon.style.display = "none";
             divSpinner.style.display = "block";
 
             if (elem.dataset.search.indexOf("javascript:") === 0) {
                 //Build options from local data
-                searchselect._setSearchSelectOptions(eval(elem.dataset.search.substring(11)));
+                component._setSearchSelectOptions(eval(elem.dataset.search.substring(11)));
                 searching = false;
                 divIcon.style.display = "inherit";
                 divSpinner.style.display = "none";
@@ -200,7 +208,7 @@ class Searchselect {
                     "method": "GET",
                     "dataType": "json",
                     "success": function (data) {
-                        searchselect._setSearchSelectOptions(data);
+                        component._setSearchSelectOptions(data);
                         searching = false;
                         divIcon.style.display = "inherit";
                         divSpinner.style.display = "none";
@@ -219,12 +227,23 @@ class Searchselect {
     }
 
     /**
+     *
+     * @private
+     */
+    _deselectAll() {
+        this._elem.selectedIndex = -1;
+        for (let i = 0; i < this._elem.options.length; i++) {
+            this._elem.options[i].selected = false;
+        }
+    }
+
+    /**
      * Marks the selected option, removes the other options, closes the options box and copies the text to input.
      *
      * @private
      */
     _markSelectedOptionOfSearchSelect() {
-        $(this._elem).css("left", "-8000px");
+        this._elem.classList.add("hide-element");
 
         let event;
         event = document.createEvent('HTMLEvents');
@@ -234,10 +253,10 @@ class Searchselect {
             this._input.value = "";
             this._elem.selectedIndex = -1;
 
-            if (this._elem.lastValue !== null) {
-                Base.dispatchEvent(this._elem, "change");
+            if (this._lastValue !== null) {
+                this._lastValue = null;
+                Scaliby.dispatchEvent(this._elem, "change");
             }
-            this._elem.lastValue = null;
             return;
         }
 
@@ -257,9 +276,9 @@ class Searchselect {
         this._input.value = this._elem.options[0].text;
 
         //Execute the change event
-        if (this._elem.lastValue !== this._elem.options[0].value) {
-            this._elem.lastValue = this._elem.options[0].value;
-            Base.dispatchEvent(this._elem, "change");
+        if (this._lastValue !== this._elem.options[0].value) {
+            this._lastValue = this._elem.options[0].value;
+            Scaliby.dispatchEvent(this._elem, "change");
         }
     }
 
@@ -303,8 +322,20 @@ class Searchselect {
         }
 
         if (options.length === 0) {
-            $(this._elem).css("left", "-8000px");
+            this._elem.classList.add("hide-element");
         }
+
+        //Total of rows to show
+        let size = this._elem.options.length;
+
+        if (this._elem.dataset.maxRows && this._elem.options.length > this._elem.dataset.maxRows) {
+            size = this._elem.dataset.maxRows;
+        }
+        if (size <= 1) {
+            size = 2;
+        }
+
+        this._elem.size = size;
     }
 
 
@@ -329,20 +360,17 @@ class Searchselect {
         });
 
         //Create the main element
-        this._div = Base.createElement({
+        this._main = Base.createElement({
             tag: "div",
-            classes: ["mdc-text-field", "mdc-text-field--with-trailing-icon", "multiselect-div",
-                "input-bg", "input-fullwidth"],
-            styles: ["overflow", "visible"],
+            classes: ["mdc-text-field", "mdc-text-field--with-trailing-icon"],
             parent: this._container
         });
 
         //Configure the element
         Base.configElement(elem, {
             generateId: true,
-            classes: ["searchselect"],
-            attrs: ["tabindex", "-1"],
-            parent: this._div
+            classes: ["searchselect", "hide-element"],
+            parent: this._container
         });
         if (this._elem.size < 2) {
             this._elem.size = 2;
@@ -353,11 +381,9 @@ class Searchselect {
             tag: "input",
             id: elem.id + "_input",
             classes: ["mdc-text-field__input"],
-            styles: ["padding", "18px 12px 2px"],
-            attrs: ["tab-index", elem.tabIndex, "autocomplete", "off"],
-            parent: this._div
+            attrs: ["autocomplete", "off"],
+            parent: this._main
         });
-        this._input.select = this._elem;
 
         //Create the label
         this._label = Base.createElement({
@@ -365,24 +391,22 @@ class Searchselect {
             id: elem.id + "_label",
             classes: ["mdc-floating-label"],
             attrs: ["for", this._input.id],
-            styles: ["bottom", "12px"],
-            parent: this._div
+            parent: this._main
         });
 
         //Create the icon of search
         this._divIcon = Base.createElement({
             tag: "i",
             classes: ["material-icons", "mdc-text-field__icon"],
-            styles: ["bottom", "10px"],
             content: "search",
-            parent: this._div
+            parent: this._main
         });
 
         //Create the line ripple
         Base.createElement({
             tag: "div",
             classes: ["mdc-line-ripple"],
-            parent: this._div
+            parent: this._main
         });
 
         //Create the loading spinner
@@ -390,7 +414,7 @@ class Searchselect {
         Base.configElement(this._divSpinner, {
             classes: ["mdc-text-field__icon"],
             styles: ["display", "none", "top", "16px"],
-            parent: this._div
+            parent: this._main
         });
 
         //Create the error message
@@ -410,35 +434,15 @@ class Searchselect {
 
         //Final settings
         this._createEvents();
-        this._inputMdc = new mdc.textField.MDCTextField(this._div);
-        if (this._elem.options.length === 1) {
-            this._elem.selectedIndex = 0;
-        }
+        this._createMDC();
         this._elem.autofocus = false;
 
         this.update();
         if (this._elem.dataset.oncreated) {
             eval(this._elem.dataset.oncreated);
         }
-    }
 
-    /**
-     * Update the component.
-     */
-    update() {
-        if (this._elem.selectedIndex !== -1) {
-            $(this._input).val(this._elem.options[this._elem.selectedIndex].innerHTML);
-            this._markSelectedOptionOfSearchSelect();
-        }
-        Base.showInputComponent(this._elem);
-
-        $(this._label).html($(this._elem).attr("data-label"));
-        this._inputMdc.value = this._input.value;
-
-        //Adjust if required and empty
-        this._input.required = this._elem.required;
-        this._inputMdc.required = this._input.required;
-        let searchselect = this;
+        //Show red when component starts empty and it is required
         setTimeout(function () {
             if (searchselect._elem.disabled === false && searchselect._input.value === "" &&
                 searchselect._input.required) {
@@ -447,13 +451,46 @@ class Searchselect {
                 searchselect._input.parentNode.classList.remove("mdc-text-field--invalid");
             }
         }, 100);
+    }
 
-        //Adjust if disabled
-        this._input.disabled = this._elem.disabled;
-        this._inputMdc.disabled = this._elem.disabled;
+    /**
+     * Update the component.
+     */
+    update() {
+        //Set the option
+        if (this._elem.options.length === 1) {
+            this._input.value = this._elem.options[0].value;
+            this._elem._mdcInput.value = this._elem.options[0].innerHTML;
+        }
 
-        //Show the error message
+        //Adjust the properties
+        this._input.required = this._elem.required;
+        this._elem._mdcInput.disabled = this._elem.disabled;
+        this._label.innerHTML = this._elem.dataset.label;
         Base.showInputMessageError(this._elem);
+        Base.showInputComponent(this._elem);
+
+        //Adjust the tab index of input
+        let component = this;
+        setTimeout(function() {
+            if (component._elem.tabIndex !== -2) {
+                component._input.tabIndex = component._elem.tabIndex;
+                component._elem.tabIndex = -2;
+            }
+        }, 100);
+   }
+
+    /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdcInput) {
+            try {
+                this._elem._mdcInput.destroy();
+                this._elem._mdcInput = null;
+            } catch (ex) {
+            }
+        }
     }
 
     /**
@@ -472,6 +509,37 @@ class Searchselect {
      */
     getContainer() {
         return this._container;
+    }
+
+    /**
+     * Defines the option of searchselect component. This component can be only one option.
+     * <br>
+     * This method is static, therefore it can be used before or after the component to be created.
+     *
+     * @param {string} formId    ID of form. If null, the "fieldName" parameter is the ID of element
+     * @param {string} fieldName Name of field
+     * @param {string} value     The value of option
+     * @param {string} text      The text of value
+     */
+    static setOption(formId, fieldName, value, text) {
+        //Remove the current options of select
+        let elem = Form.getField(formId, fieldName);
+        while (elem.options.length > 0) {
+            elem.remove(0);
+        }
+
+        //Build the option
+        let option = Base.createElement({
+            tag: "option",
+            attrs: ["value", value, "selected", true],
+            content: text,
+            parent: elem
+        });
+        option.selected = true;
+
+        if (elem.component) {
+            elem.component.update()
+        }
     }
 
 }

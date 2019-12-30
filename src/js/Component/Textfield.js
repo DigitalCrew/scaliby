@@ -15,9 +15,6 @@ class Textfield {
     /** Element of component. */
     _elem;
 
-    /** MDC framework. */
-    _mdc;
-
     /** Container of elements. */
     _container;
 
@@ -27,47 +24,81 @@ class Textfield {
     /** Element with message error. */
     _errorElement;
 
+    /* Main element. */
+    _main;
+
+    /** Left icon. */
+    _leftIcon;
+
+    /** Right icon. */
+    _rightIcon;
+
+
+    /**
+     * Creates the MDC component.
+     *
+     * @private
+     */
+    _createMDC() {
+        this.destroy();
+        this._elem._mdc = new mdc.textField.MDCTextField(this._main);
+    }
 
     /**
      * Create the icon of input.
      *
+     * @param {object} div   Main element
+     * @param {string} name  Icon name
+     * @param {boolean} left If true, the icon is in the left position, otherwise the icon is in the right position
+     *
      * @private
      */
-    _createIcon(div) {
+    _createIcon(div, name, left) {
         //Name of icon
         let iconName;
-        let styles = ["bottom", "10px", "cursor", "pointer", "pointer-events", "inherit"];
-        if (this._elem.dataset.icon === "DATE") {
+        let styles = ["cursor", "pointer", "pointer-events", "inherit"];
+        if (name === "DATE") {
             iconName = "date_range";
-        } else if (this._elem.dataset.icon === "TIME") {
+        } else if (name === "TIME") {
             iconName = "access_time";
         } else {
-            iconName = this._elem.dataset.icon;
-            styles = ["bottom", "10px"];
+            iconName = name;
+            styles = [];
         }
 
         //Create icon
-        this._icon = Scaliby.createIcon(iconName);
-        Base.configElement(this._icon, {
+        let icon = Scaliby.createIcon(iconName);
+        Base.configElement(icon, {
             id: iconName === "date_range" || iconName === "access_time" ? this._elem.id + "_icon" : null,
-            classes: ["mdc-text-field__icon"],
+            classes: ["material-icons", "mdc-text-field__icon"],
             styles: styles,
-            attrs: ["tab-index", "0", "role", "button"],
-            parent: div
+            attrs: ["tab-index", "0", "role", "button"]
         });
+
+        if (left === true) {
+            this._leftIcon = icon;
+            div.classList.add("mdc-text-field--with-leading-icon");
+            Base.insertElementAt(icon, div, 0);
+        } else {
+            this._rightIcon = icon;
+            div.classList.add("mdc-text-field--with-trailing-icon");
+            div.appendChild(icon);
+        }
     }
 
     /**
      * Create date picker component.
      *
+     * @param {object} icon Icon of date
+     *
      * @private
      */
-    _createDatePicker() {
+    _createDatePicker(icon) {
         let elem = this._elem;
-        let mdc = this._mdc;
+        let mdc = this._elem._mdc;
         elem.dataset.mask = "Textfield.getDefaultDateMask";
 
-        $(this._icon).duDatepicker({
+        $(icon).duDatepicker({
             format: "dd/mm/yyyy",
             cancelBtn: true
         }).on("datechanged", function(event) {
@@ -77,7 +108,7 @@ class Textfield {
         });
 
         $(elem).on("change", function() {
-            $(this._icon).duDatepicker("setValue", elem.value);
+            $(icon).duDatepicker("setValue", elem.value);
         });
         $(elem).trigger("change");
     }
@@ -85,21 +116,28 @@ class Textfield {
     /**
      * Create time picker component.
      *
+     * @param {object} icon Icon of time
+     *
      * @private
      */
-    _createTimePicker() {
+    _createTimePicker(icon) {
         let elem = this._elem;
-        let mdc = this._mdc;
+        let mdc = this._elem._mdc;
         elem.dataset.mask = "Textfield.getDefaultTimeMask";
 
-        $(this._icon).mdtimepicker({timeFormat: "hh:mm"}).on("timechanged", function (event) {
+        $(icon).mdtimepicker({timeFormat: "hh:mm"}).on("timechanged", function (event) {
             if (mdc !== undefined) {
                 mdc.value = event.time;
             }
         });
 
         $(elem).on("change", function () {
-            $(this._icon).mdtimepicker("setValue", elem.value);
+            if (elem.value) {
+                try {
+                    $(icon).mdtimepicker("setValue", elem.value);
+                } catch (ex) {
+                }
+            }
         });
         $(elem).trigger("change");
     }
@@ -126,14 +164,14 @@ class Textfield {
         });
 
         //Create the main element
-        let div = Base.createElement({
+        this._main = Base.createElement({
             tag: "div",
-            classes: ["mdc-text-field", "mdc-text-field--with-trailing-icon", "input-fullwidth"],
+            classes: ["mdc-text-field"],
             parent: this._container
         });
 
         //Configure the element
-        $(this._elem).appendTo(div);
+        $(this._elem).appendTo(this._main);
         Base.configElement(this._elem, {
             generateId: true,
             classes: ["mdc-text-field__input"]
@@ -146,19 +184,22 @@ class Textfield {
             content: this._elem.dataset.label,
             classes: ["mdc-floating-label"],
             attrs: ["for", this._elem.id],
-            parent: div
+            parent: this._main
         });
 
-        //Create the icon
-        if (this._elem.dataset.icon) {
-            this._createIcon(div);
+        //Create the icons
+        if (this._elem.dataset.leftIcon) {
+            this._createIcon(this._main, this._elem.dataset.leftIcon, true);
+        }
+        if (this._elem.dataset.rightIcon) {
+            this._createIcon(this._main, this._elem.dataset.rightIcon, false);
         }
 
         //Create the line ripple
         Base.createElement({
             tag: "div",
             classes: ["mdc-line-ripple"],
-            parent: div
+            parent: this._main
         });
 
         //Create the error message
@@ -169,12 +210,18 @@ class Textfield {
         });
 
         //Final settings
-        this._mdc = new mdc.textField.MDCTextField(div);
+        this._createMDC();
 
-        if (elem.dataset.icon === "DATE") {
-            this._createDatePicker();
-        } else if (elem.dataset.icon === "TIME") {
-            this._createTimePicker();
+        if (elem.dataset.leftIcon === "DATE") {
+            this._createDatePicker(this._leftIcon);
+        } else if (elem.dataset.leftIcon === "TIME") {
+            this._createTimePicker(this._leftIcon);
+        }
+
+        if (elem.dataset.rightIcon === "DATE") {
+            this._createDatePicker(this._rightIcon);
+        } else if (elem.dataset.rightIcon === "TIME") {
+            this._createTimePicker(this._rightIcon);
         }
 
         this.update();
@@ -189,8 +236,8 @@ class Textfield {
     update() {
         this._label.innerHTML = this._elem.dataset.label;
         Base.showInputMessageError(this._elem);
-        this._mdc.value = this._elem.value;
-        this._mdc.disabled = this._elem.disabled;
+        this._elem._mdc.value = this._elem.value;
+        this._elem._mdc.disabled = this._elem.disabled;
         Base.showInputComponent(this._elem);
 
         //Define the mask
@@ -212,6 +259,19 @@ class Textfield {
     }
 
     /**
+     * Clean up the component and MDC Web component.
+     */
+    destroy() {
+        if (this._elem._mdc) {
+            try {
+                this._elem._mdc.destroy();
+                this._elem._mdc = null;
+            } catch (ex) {
+            }
+        }
+    }
+
+    /**
      * Gets the error message element.
      *
      * @return {Object} the element.
@@ -227,5 +287,28 @@ class Textfield {
      */
     getContainer() {
         return this._container;
+    }
+
+    /**
+     * Gets the mask of date input.
+     *
+     * @return {string} the mask.
+     */
+    static getDefaultDateMask() {
+        return {
+          type: "date"
+        }
+    }
+
+    /**
+     * Gets the mask of time input.
+     *
+     * @return {string} the mask.
+     */
+    static getDefaultTimeMask() {
+        return {
+            type: "string",
+            definition: "00:00"
+        }
     }
 }
