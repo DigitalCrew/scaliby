@@ -1,3 +1,25 @@
+# 1.5.2 (2020-01-17)
+
+### New Features
+
+### Changed Features
+* Big change for new version 4.0.0 of MDC. [Fernando Viegas] [2020-01-17 11:12:45 -0300]
+* Big change for new version 4.0.0 of MDC. [Fernando Viegas] [2019-12-30 19:36:37 -0300]
+
+### Bug Fixes
+
+### No Type
+
+# 1.5.1 (2020-01-17)
+
+### New Features
+
+### Changed Features
+
+### Bug Fixes
+
+### No Type
+
 # 1.0.3 (2019-11-06)
 
 ### New Features
